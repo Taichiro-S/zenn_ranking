@@ -8,7 +8,8 @@
     "build": "node build.js",
     "format": "eslint src __test__ --fix && prettier --write src __test__",
     "lint": "eslint src __test__",
-    "test": "jest"
+    "test": "jest",
+    "test:coverage": "npm run test -- --coverage --silent --testLocationInResults --ci --json --outputFile=\"report.json\""
   },
   "keywords": [],
   "author": "",
