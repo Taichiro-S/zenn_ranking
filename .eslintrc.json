@@ -1,0 +1,15 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "googleappsscript/googleappsscript": true,
+    "jest": true
+  },
+  "plugins": ["googleappsscript", "jest"],
+  "extends": ["standard", "prettier", "plugin:jest/recommended"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "rules": {}
+}

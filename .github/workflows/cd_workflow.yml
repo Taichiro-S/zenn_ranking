@@ -1,0 +1,50 @@
+name: CD workflow
+
+on:
+  push:
+    branches:
+      - main
+      - stg
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      ID_TOKEN: ${{ secrets.ID_TOKEN }}
+      REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - name: Install Clasp
+        run: |
+          npm init -y
+          npm install -g @google/clasp
+      - name: Generate ~/.clasprc.json
+        run: |
+          bash deployment/setup.sh
+      - name: Setup SCRIPT_ID
+        run: |
+          if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
+            echo "SCRIPT_ID=${{ secrets.PRODUCTION_SCRIPT_ID }}" >> $GITHUB_ENV
+          elif [[ ${{ github.ref }} == 'refs/heads/stg' ]]; then
+            echo "SCRIPT_ID=${{ secrets.STAGING_SCRIPT_ID }}" >> $GITHUB_ENV
+          fi
+      - name: Generate ~/.clasp.json
+        run: |
+          bash deployment/setup_claspjson.sh
+      - name: Install Dependencies
+        run: |
+          npm ci
+      - name: Build
+        run: |
+          npm run build
+      - name: Deploy
+        run: |
+          clasp push
