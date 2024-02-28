@@ -1,6 +1,6 @@
-import { SLACK_WEBHOOK_URL } from './constants'
+import { SLACK_WEBHOOK_URL } from './script_property'
 
-export function sendMonthlyMessageToSlackChannel(message) {
+export function sendMessageToSlackChannel(message) {
   const payload = JSON.stringify(message)
   const options = {
     method: 'post',

@@ -3,4 +3,4 @@ dist/main.js
 coverage/
 .env
 .clasprc.json
-
+report.json

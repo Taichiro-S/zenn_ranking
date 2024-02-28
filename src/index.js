@@ -1,6 +1,6 @@
 import { ADMIN_EMAIL } from './script_property'
 import { formatMessageForSlack } from './format_message_for_slack'
-import { sendMonthlyMessageToSlackChannel, sendWeeklyMessageToSlackChannel } from './slack_api'
+import { sendMessageToSlackChannel } from './slack_api'
 import { saveMonthlyArticlesToSpreadsheet, saveWeeklyArticlesToSpreadsheet } from './google_sp_api'
 
 // GASから関数を呼び出すために、グローバル変数に登録する
@@ -14,7 +14,7 @@ global.distributeWeeklyRanking = distributeWeeklyRanking
 function distributeMonthlyRanking() {
   try {
     const message = formatMessageForSlack('monthly')
-    sendMonthlyMessageToSlackChannel(message)
+    sendMessageToSlackChannel(message)
     saveMonthlyArticlesToSpreadsheet()
   } catch (e) {
     const subject = 'プロジェクト[Zennランキング]で、GASの実行中にエラーが発生しました。'
@@ -26,7 +26,7 @@ function distributeMonthlyRanking() {
 function distributeWeeklyRanking(event) {
   try {
     const message = formatMessageForSlack('weekly')
-    sendWeeklyMessageToSlackChannel(message)
+    sendMessageToSlackChannel(message)
     saveWeeklyArticlesToSpreadsheet()
   } catch (e) {
     const subject = 'プロジェクト[dc_gform2sp]で、GASの実行中にエラーが発生しました。'
