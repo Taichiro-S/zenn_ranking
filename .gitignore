@@ -1,6 +1,7 @@
 node_modules/
-dist/main.js
 coverage/
 .env
 .clasprc.json
 report.json
+dist/main.js
+
