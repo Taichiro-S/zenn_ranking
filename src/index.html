@@ -21,7 +21,10 @@
           'Content-Type': 'application/json'
         }
       })
-        .then((response) => response.json())
+        .then((response) => {
+          console.log('response:', response)
+          return response.json()
+        })
         .then((data) => {
           if (data.ok) {
             window.location.href = data.redirectUrl
