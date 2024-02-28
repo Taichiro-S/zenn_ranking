@@ -48,7 +48,7 @@ jobs:
           npm run build
       - name: Push
         run: |
-          clasp push
+          echo -y | clasp push
       - name: DEPLOY
         run: |
           clasp deploy --deploymentId $DEPLOYMENT_ID
