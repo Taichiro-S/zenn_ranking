@@ -1,11 +1,12 @@
 import { ADMIN_EMAIL } from './script_property'
 import { formatMessageForSlack } from './format_message_for_slack'
-import { sendMessageToSlackChannel } from './slack_api'
+import { sendMessageToSlackChannel, doPost } from './slack_api'
 import { saveMonthlyArticlesToSpreadsheet, saveWeeklyArticlesToSpreadsheet } from './google_sp_api'
 
 // GASから関数を呼び出すために、グローバル変数に登録する
 global.distributeMonthlyRanking = distributeMonthlyRanking
 global.distributeWeeklyRanking = distributeWeeklyRanking
+global.doPost = doPost
 /**
  * フォーム送信時に回答をスプレッドシートに記入
  * @param {object} event
