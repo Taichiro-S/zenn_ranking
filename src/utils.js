@@ -14,3 +14,15 @@ export function formatTime(date) {
 
   return hours + ':' + minutes
 }
+
+export function escapeMarkdownSpecialChars(text) {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+export function formatDate(date) {
+  const res = Utilities.formatDate(date, Session.getScriptTimeZone(), 'MM/dd')
+  if (res.startsWith(0)) {
+    return res.slice(1, res.length)
+  }
+  return res
+}
