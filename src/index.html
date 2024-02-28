@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>認証完了</title>
+  </head>
+  <body>
+    <h1>認証に成功しました😊</h1>
+    <p>アプリケーションを使用する準備ができました。</p>
+    <script>
+      const urlParams = new URLSearchParams(window.location.search)
+      const code = urlParams.get('code')
+
+      const scriptUrl = `${window.location.origin}${window.location.pathname}`
+
+      fetch(scriptUrl, {
+        method: 'POST',
+        body: JSON.stringify({ code: code }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.ok) {
+            window.location.href = data.redirectUrl
+          } else {
+            console.error('Error:', data.error)
+          }
+        })
+        .catch((e, s) => {
+          console.error('Error:', e)
+          console.error('Stack:', s)
+        })
+    </script>
+  </body>
+</html>

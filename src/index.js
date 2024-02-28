@@ -7,11 +7,17 @@ import { saveMonthlyArticlesToSpreadsheet, saveWeeklyArticlesToSpreadsheet } fro
 global.distributeMonthlyRanking = distributeMonthlyRanking
 global.distributeWeeklyRanking = distributeWeeklyRanking
 global.doPost = doPost
+global.doGet = doGet
 /**
  * フォーム送信時に回答をスプレッドシートに記入
  * @param {object} event
  * @return {void}
  */
+
+function doGet(e) {
+  return HtmlService.createHtmlOutputFromFile('index')
+}
+
 function distributeMonthlyRanking() {
   try {
     const message = formatMessageForSlack('monthly')
