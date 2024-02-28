@@ -36,7 +36,7 @@ export function saveWeeklyArticlesToSpreadsheet() {
   sheet.getRange(1, 1, data.length, data[0].length).setValues(data)
 }
 
-function saveMonthlyArticlesToSpreadsheet() {
+export function saveMonthlyArticlesToSpreadsheet() {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
   const today = new Date()
   const start = new Date(today.getFullYear(), today.getMonth(), 1)

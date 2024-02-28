@@ -62,7 +62,6 @@ export function formatMessageForSlack(period) {
       }
     })
 
-    // セクションブロックを追加（記事のタイトルとリンク）
     message.blocks.push({
       type: 'section',
       text: {
