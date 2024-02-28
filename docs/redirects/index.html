@@ -27,12 +27,12 @@
           if (data.ok) {
             window.location.href = data.redirectUrl
           } else {
-            window.location.replace('https://taichiro-s.github.io/notion_sample/redirects/fallback.html')
+            // window.location.replace('https://taichiro-s.github.io/notion_sample/redirects/fallback.html')
             console.error('Error:', data.error)
           }
         })
         .catch((error) => {
-          window.location.replace('https://taichiro-s.github.io/notion_sample/redirects/fallback.html')
+          //   window.location.replace('https://taichiro-s.github.io/notion_sample/redirects/fallback.html')
           console.error('Error:', error)
         })
     </script>
