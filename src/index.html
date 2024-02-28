@@ -13,7 +13,8 @@
       const code = urlParams.get('code')
 
       const scriptUrl = `${window.location.origin}${window.location.pathname}`
-
+      console.log('scriptUrl:', scriptUrl)
+      console.log('code:', code)
       fetch(scriptUrl, {
         method: 'POST',
         body: JSON.stringify({ code: code }),
