@@ -19,10 +19,9 @@ function doGet(e) {
   // URLパラメータからcodeを取得
   const code = e.parameter.code
   console.log('doget')
-  console.log(code)
   if (code) {
     console.log(code)
-
+    console.log(SLACK_APP_CLIENT_ID, SLACK_APP_CLIENT_SECRET, REDIRECT_URL)
     try {
       const res = UrlFetchApp.fetch('https://slack.com/api/oauth.v2.access', {
         method: 'post',
