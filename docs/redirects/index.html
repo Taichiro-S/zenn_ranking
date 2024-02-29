@@ -11,7 +11,7 @@
     <script>
       const urlParams = new URLSearchParams(window.location.search)
       const code = urlParams.get('code')
-
+      console.log('code:', code)
       fetch(
         'https://script.google.com/macros/s/AKfycbzwus3arL2j-_a2Z0Et4AoeAXxGvKhSpV0JDA5in_kGs8n8j-2xuV1XEPHbwVJ1EuG9Zg/exec',
         {
@@ -22,18 +22,20 @@
           }
         }
       )
-        .then((response) => response.json())
+        .then((response) => {
+          console.log('response:', response)
+          return response.json()
+        })
         .then((data) => {
           if (data.ok) {
             window.location.href = data.redirectUrl
           } else {
-            window.location.replace('https://taichiro-s.github.io/notion_sample/redirects/fallback.html')
             console.error('Error:', data.error)
           }
         })
-        .catch((error) => {
-          window.location.replace('https://taichiro-s.github.io/notion_sample/redirects/fallback.html')
-          console.error('Error:', error)
+        .catch((e, s) => {
+          console.error('Error:', e)
+          console.error('Stack:', s)
         })
     </script>
   </body>

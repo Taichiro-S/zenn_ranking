@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>認証成功</title>
+  </head>
+  <body>
+    <h1>認証に成功しました 😊</h1>
+    <p>以下からSlackアプリを開いてください</p>
+    <button onclick="openSlackApp()">Slackアプリを開く</button>
+    <script>
+      function openSlackApp() {
+        var url = '<?= redirectUrl ?>'
+        window.open(url, '_blank').focus()
+      }
+    </script>
+  </body>
+</html>

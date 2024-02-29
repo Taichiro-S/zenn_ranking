@@ -7,6 +7,12 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
+const filesToCopy = [
+  { srcPath: 'src', destPath: 'dist', fileName: 'version.js' },
+  { srcPath: 'src/html', destPath: 'dist', fileName: 'auth_success.html' },
+  { srcPath: 'src/html', destPath: 'dist', fileName: 'auth_fail.html' }
+]
+
 esbuild
   .build({
     entryPoints: ['src/index.js'],
@@ -16,12 +22,14 @@ esbuild
     plugins: [GasPlugin]
   })
   .then(() => {
-    const srcPath = path.join(__dirname, 'src', 'version.js')
-    const destPath = path.join(__dirname, 'dist', 'version.js')
+    filesToCopy.forEach((file) => {
+      const srcPath = path.join(__dirname, file.srcPath, file.fileName)
+      const destPath = path.join(__dirname, file.destPath, file.fileName)
 
-    fs.copyFile(srcPath, destPath, (err) => {
-      if (err) throw err
-      console.log('version.js was copied to dist directory.')
+      fs.copyFile(srcPath, destPath, (err) => {
+        if (err) throw err
+        console.log(`${file.fileName} was copied to dist directory.`)
+      })
     })
   })
   .catch((e) => {
