@@ -7,16 +7,9 @@ import { saveMonthlyArticlesToSpreadsheet, saveWeeklyArticlesToSpreadsheet } fro
 // GASから関数を呼び出すために、グローバル変数に登録する
 global.distributeMonthlyRanking = distributeMonthlyRanking
 global.distributeWeeklyRanking = distributeWeeklyRanking
-// global.doPost = doPost
 global.doGet = doGet
-/**
- * フォーム送信時に回答をスプレッドシートに記入
- * @param {object} event
- * @return {void}
- */
 
 function doGet(e) {
-  // URLパラメータからcodeを取得
   const code = e.parameter.code
   console.log('doget')
   if (code) {
@@ -39,10 +32,18 @@ function doGet(e) {
         const teamId = resJson.team.id
         const appId = resJson.app_id
         const redirectUrl = `https://slack.com/app_redirect?team=${teamId}&app=${appId}`
-        // リダイレクトURLにリダイレクト
-        return HtmlService.createHtmlOutput(
-          "認証に成功しました。リダイレクト中...<script>window.location='" + redirectUrl + "';</script>"
-        )
+        console.log(redirectUrl)
+        const template = HtmlService.createTemplateFromFile('auth_success')
+
+        // テンプレートにリダイレクトURLを渡す
+        template.redirectUrl = redirectUrl
+
+        // HTMLを評価して出力
+        return template.evaluate()
+        // return HtmlService.createHtmlOutput(
+        //   "認証に成功しました。リダイレクト中...<script>window.location='" + redirectUrl + "';</script>"
+        // )
+        // return HtmlService.createHtmlOutputFromFile('auth_success')
       } else {
         return HtmlService.createHtmlOutput('認証に失敗しました。')
       }
