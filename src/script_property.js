@@ -38,3 +38,9 @@ export const GCP_SERVICE_ACCOUNT_KEY = JSON.parse(scriptProperties.getProperty('
  * @type {string}
  */
 export const CLOUD_DATASTORE_TABLE_NAME = scriptProperties.getProperty('CLOUD_DATASTORE_TABLE_NAME')
+
+/**
+ * slackのOAuth認証のリダイレクトURL
+ * @type {string}
+ */
+export const REDIRECT_URL = scriptProperties.getProperty('REDIRECT_URL')

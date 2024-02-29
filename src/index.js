@@ -1,4 +1,4 @@
-import { ADMIN_EMAIL, SLACK_APP_CLIENT_ID, SLACK_APP_CLIENT_SECRET } from './script_property'
+import { ADMIN_EMAIL, SLACK_APP_CLIENT_ID, SLACK_APP_CLIENT_SECRET, REDIRECT_URL } from './script_property'
 import { formatMessageForSlack } from './format_message_for_slack'
 import { sendMessageToSlackChannel } from './slack_api'
 import {
@@ -7,7 +7,7 @@ import {
   fetchSlackWebhookUrls,
   saveOAuthInfo
 } from './google_api'
-import { REDIRECT_URL } from './constants'
+
 // GASから関数を呼び出すために、グローバル変数に登録する
 global.distributeMonthlyRanking = distributeMonthlyRanking
 global.distributeWeeklyRanking = distributeWeeklyRanking
