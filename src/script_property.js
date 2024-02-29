@@ -37,4 +37,4 @@ export const GCP_SERVICE_ACCOUNT_KEY = JSON.parse(scriptProperties.getProperty('
  * テスト用スクリプトと本番用スクリプトで異なる名前にする
  * @type {string}
  */
-export const CLOUD_DATASTORE_TABLE_NAME = JSON.parse(scriptProperties.getProperty('CLOUD_DATASTORE_TABLE_NAME'))
+export const CLOUD_DATASTORE_TABLE_NAME = scriptProperties.getProperty('CLOUD_DATASTORE_TABLE_NAME')
