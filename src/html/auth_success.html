@@ -8,6 +8,13 @@
   <body>
     <h1>認証に成功しました 😊</h1>
     <a href="<?= redirectUrl ?>">Slackアプリに移動</a>
-    <script></script>
+    <button onclick="openSlackApp()">Slackアプリを開く</button>
+    <script>
+      function openSlackApp() {
+        // SlackへのリダイレクトURL
+        var url = '<?= redirectUrl ?>'
+        window.open(url, '_blank').focus()
+      }
+    </script>
   </body>
 </html>
