@@ -33,7 +33,7 @@ export const SLACK_APP_CLIENT_SECRET = scriptProperties.getProperty('SLACK_APP_C
 export const GCP_SERVICE_ACCOUNT_KEY = JSON.parse(scriptProperties.getProperty('GCP_SERVICE_ACCOUNT_KEY'))
 
 /**
- * データベースのテーブル名
+ * 認証したslackチャンネルのデータを保存するデータベースのテーブル名
  * テスト用スクリプトと本番用スクリプトで異なる名前にする
  * @type {string}
  */

@@ -86,8 +86,8 @@ export function saveOAuthInfo(resJson) {
           key: {
             path: [
               {
-                kind: 'SlackOAuthInfo',
-                name: CLOUD_DATASTORE_TABLE_NAME + resJson.team.id
+                kind: CLOUD_DATASTORE_TABLE_NAME,
+                name: 'SlackOAuthInfo_' + resJson.team.id
               }
             ]
           },
@@ -129,7 +129,7 @@ export function fetchSlackWebhookUrls() {
     query: {
       kind: [
         {
-          name: 'SlackOAuthInfo'
+          name: CLOUD_DATASTORE_TABLE_NAME
         }
       ],
       projection: [
