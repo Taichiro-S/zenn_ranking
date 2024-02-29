@@ -1,13 +1,18 @@
 import { ADMIN_EMAIL } from './script_property'
 import { formatMessageForSlack } from './format_message_for_slack'
-import { sendMessageToSlackChannel, slackAppOAuth, fetchSlackWebhookUrls } from './slack_api'
-import { saveMonthlyArticlesToSpreadsheet, saveWeeklyArticlesToSpreadsheet } from './google_api'
+import { sendMessageToSlackChannel, slackAppOAuth } from './slack_api'
+import { saveMonthlyArticlesToSpreadsheet, saveWeeklyArticlesToSpreadsheet, fetchSlackWebhookUrls } from './google_api'
 
 // GASから関数を呼び出すために、グローバル変数に登録する
 global.distributeMonthlyRanking = distributeMonthlyRanking
 global.distributeWeeklyRanking = distributeWeeklyRanking
 global.doGet = doGet
 
+/**
+ * slackのOAuth認証を行うためのリダイレクト先
+ * @param {*} e
+ * @returns
+ */
 function doGet(e) {
   const code = e.parameter.code
   if (code) {
@@ -17,6 +22,9 @@ function doGet(e) {
   }
 }
 
+/**
+ * 月間ランキングを配信する
+ */
 function distributeMonthlyRanking() {
   try {
     const webhookUrls = fetchSlackWebhookUrls()
@@ -32,7 +40,11 @@ function distributeMonthlyRanking() {
   }
 }
 
-function distributeWeeklyRanking(event) {
+/**
+ * 週間ランキングを配信する
+ * @param {*} event
+ */
+function distributeWeeklyRanking() {
   try {
     const webhookUrls = fetchSlackWebhookUrls()
     const message = formatMessageForSlack('weekly')
