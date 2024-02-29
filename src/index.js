@@ -1,12 +1,12 @@
 import { ADMIN_EMAIL } from './script_property'
 import { formatMessageForSlack } from './format_message_for_slack'
-import { sendMessageToSlackChannel, doPost } from './slack_api'
+import { sendMessageToSlackChannel } from './slack_api'
 import { saveMonthlyArticlesToSpreadsheet, saveWeeklyArticlesToSpreadsheet } from './google_sp_api'
 
 // GASから関数を呼び出すために、グローバル変数に登録する
 global.distributeMonthlyRanking = distributeMonthlyRanking
 global.distributeWeeklyRanking = distributeWeeklyRanking
-global.doPost = doPost
+// global.doPost = doPost
 global.doGet = doGet
 /**
  * フォーム送信時に回答をスプレッドシートに記入
@@ -17,17 +17,54 @@ global.doGet = doGet
 function doGet(e) {
   // URLパラメータからcodeを取得
   const code = e.parameter.code
+  if (code) {
+    try {
+      const res = UrlFetchApp.fetch('https://slack.com/api/oauth.v2.access', {
+        method: 'post',
+        payload: {
+          code,
+          client_id: 'SLACK_APP_CLIENT_ID', // 実際のクライアントIDに置き換えてください
+          client_secret: 'SLACK_APP_CLIENT_SECRET', // 実際のクライアントシークレットに置き換えてください
+          redirect_uri: 'REDIRECT_URL' // 実際のリダイレクトURLに置き換えてください
+        }
+      })
 
-  // HTMLテンプレートを取得
-  const template = HtmlService.createTemplateFromFile('index')
+      const resJson = JSON.parse(res.getContentText())
 
-  // codeをテンプレートに渡す
-  template.code = code
-
-  // HTMLテンプレートを評価して出力
-  return template.evaluate()
-  // return HtmlService.createHtmlOutputFromFile('index')
+      if (resJson.ok) {
+        const teamId = resJson.team.id
+        const appId = resJson.app_id
+        const redirectUrl = `https://slack.com/app_redirect?team=${teamId}&app=${appId}`
+        // リダイレクトURLにリダイレクト
+        return HtmlService.createHtmlOutput(
+          "認証に成功しました。リダイレクト中...<script>window.location='" + redirectUrl + "';</script>"
+        )
+      } else {
+        return HtmlService.createHtmlOutput('認証に失敗しました。')
+      }
+    } catch (error) {
+      return HtmlService.createHtmlOutput('エラーが発生しました。')
+    }
+  } else {
+    // codeパラメータがない場合の処理
+    return HtmlService.createHtmlOutputFromFile('index')
+  }
 }
+
+// function doGet(e) {
+//   // URLパラメータからcodeを取得
+//   const code = e.parameter.code
+
+//   // HTMLテンプレートを取得
+//   const template = HtmlService.createTemplateFromFile('index')
+
+//   // codeをテンプレートに渡す
+//   template.code = code
+
+//   // HTMLテンプレートを評価して出力
+//   return template.evaluate()
+//   // return HtmlService.createHtmlOutputFromFile('index')
+// }
 
 function distributeMonthlyRanking() {
   try {
