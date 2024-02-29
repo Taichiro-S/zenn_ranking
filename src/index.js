@@ -18,6 +18,8 @@ global.doGet = doGet
 function doGet(e) {
   // URLパラメータからcodeを取得
   const code = e.parameter.code
+  console.log('doget')
+  console.log(code)
   if (code) {
     console.log(code)
 
