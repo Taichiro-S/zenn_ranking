@@ -34,16 +34,8 @@ function doGet(e) {
         const redirectUrl = `https://slack.com/app_redirect?team=${teamId}&app=${appId}`
         console.log(redirectUrl)
         const template = HtmlService.createTemplateFromFile('auth_success')
-
-        // テンプレートにリダイレクトURLを渡す
         template.redirectUrl = redirectUrl
-
-        // HTMLを評価して出力
         return template.evaluate()
-        // return HtmlService.createHtmlOutput(
-        //   "認証に成功しました。リダイレクト中...<script>window.location='" + redirectUrl + "';</script>"
-        // )
-        // return HtmlService.createHtmlOutputFromFile('auth_success')
       } else {
         return HtmlService.createHtmlOutput('認証に失敗しました。')
       }
