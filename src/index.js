@@ -1,4 +1,5 @@
-import { ADMIN_EMAIL } from './script_property'
+import { ADMIN_EMAIL, SLACK_APP_CLIENT_ID, SLACK_APP_CLIENT_SECRET } from './script_property'
+import { REDIRECT_URL } from './constants'
 import { formatMessageForSlack } from './format_message_for_slack'
 import { sendMessageToSlackChannel } from './slack_api'
 import { saveMonthlyArticlesToSpreadsheet, saveWeeklyArticlesToSpreadsheet } from './google_sp_api'
@@ -18,19 +19,21 @@ function doGet(e) {
   // URLパラメータからcodeを取得
   const code = e.parameter.code
   if (code) {
+    console.log(code)
+
     try {
       const res = UrlFetchApp.fetch('https://slack.com/api/oauth.v2.access', {
         method: 'post',
         payload: {
           code,
-          client_id: 'SLACK_APP_CLIENT_ID', // 実際のクライアントIDに置き換えてください
-          client_secret: 'SLACK_APP_CLIENT_SECRET', // 実際のクライアントシークレットに置き換えてください
-          redirect_uri: 'REDIRECT_URL' // 実際のリダイレクトURLに置き換えてください
+          client_id: SLACK_APP_CLIENT_ID,
+          client_secret: SLACK_APP_CLIENT_SECRET,
+          redirect_uri: REDIRECT_URL
         }
       })
 
       const resJson = JSON.parse(res.getContentText())
-
+      console.log('resJson:', resJson)
       if (resJson.ok) {
         const teamId = resJson.team.id
         const appId = resJson.app_id
