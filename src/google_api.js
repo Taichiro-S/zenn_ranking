@@ -113,7 +113,8 @@ export function saveOAuthInfo(resJson) {
     headers: {
       Authorization: 'Bearer ' + token
     },
-    payload: JSON.stringify(payload)
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
   }
 
   const response = UrlFetchApp.fetch(url, options)
