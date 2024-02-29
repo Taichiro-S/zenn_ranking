@@ -1,8 +1,8 @@
-import { ADMIN_EMAIL } from './script_property'
+import { ADMIN_EMAIL, SLACK_APP_CLIENT_ID, SLACK_APP_CLIENT_SECRET } from './script_property'
 import { formatMessageForSlack } from './format_message_for_slack'
-import { sendMessageToSlackChannel, slackAppOAuth } from './slack_api'
+import { sendMessageToSlackChannel } from './slack_api'
 import { saveMonthlyArticlesToSpreadsheet, saveWeeklyArticlesToSpreadsheet, fetchSlackWebhookUrls } from './google_api'
-
+import { REDIRECT_URL } from './constants'
 // GASから関数を呼び出すために、グローバル変数に登録する
 global.distributeMonthlyRanking = distributeMonthlyRanking
 global.distributeWeeklyRanking = distributeWeeklyRanking
@@ -16,7 +16,32 @@ global.doGet = doGet
 function doGet(e) {
   const code = e.parameter.code
   if (code) {
-    slackAppOAuth(code)
+    // slackAppOAuth(code)
+    try {
+      const res = UrlFetchApp.fetch('https://slack.com/api/oauth.v2.access', {
+        method: 'post',
+        payload: {
+          code,
+          client_id: SLACK_APP_CLIENT_ID,
+          client_secret: SLACK_APP_CLIENT_SECRET,
+          redirect_uri: REDIRECT_URL
+        }
+      })
+
+      const resJson = JSON.parse(res.getContentText())
+      if (resJson.ok) {
+        const teamId = resJson.team.id
+        const appId = resJson.app_id
+        const redirectUrl = `https://slack.com/app_redirect?team=${teamId}&app=${appId}`
+        const template = HtmlService.createTemplateFromFile('auth_success')
+        template.redirectUrl = redirectUrl
+        return template.evaluate()
+      } else {
+        return HtmlService.createHtmlOutputFromFile('auth_fail')
+      }
+    } catch (error) {
+      return HtmlService.createHtmlOutputFromFile('auth_fail')
+    }
   } else {
     return HtmlService.createHtmlOutputFromFile('auth_fail')
   }

@@ -28,7 +28,6 @@ export function slackAppOAuth(code) {
       const teamId = resJson.team.id
       const appId = resJson.app_id
       const redirectUrl = `https://slack.com/app_redirect?team=${teamId}&app=${appId}`
-      console.log(redirectUrl)
       const template = HtmlService.createTemplateFromFile('auth_success')
       template.redirectUrl = redirectUrl
       return template.evaluate()
