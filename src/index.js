@@ -1,6 +1,6 @@
 import { ADMIN_EMAIL } from './script_property'
 import { formatMessageForSlack } from './format_message_for_slack'
-import { sendMessageToSlackChannel, slackAppOAuth } from './slack_api'
+import { sendMessageToSlackChannel, slackAppOAuth, fetchSlackWebhookUrls } from './slack_api'
 import { saveMonthlyArticlesToSpreadsheet, saveWeeklyArticlesToSpreadsheet } from './google_api'
 
 // GASから関数を呼び出すために、グローバル変数に登録する
@@ -19,8 +19,11 @@ function doGet(e) {
 
 function distributeMonthlyRanking() {
   try {
+    const webhookUrls = fetchSlackWebhookUrls()
     const message = formatMessageForSlack('monthly')
-    sendMessageToSlackChannel(message)
+    webhookUrls.forEach((webhookUrl) => {
+      sendMessageToSlackChannel(message, webhookUrl)
+    })
     saveMonthlyArticlesToSpreadsheet()
   } catch (e) {
     const subject = 'プロジェクト[Zennランキング]で、GASの実行中にエラーが発生しました。'
@@ -31,8 +34,11 @@ function distributeMonthlyRanking() {
 
 function distributeWeeklyRanking(event) {
   try {
+    const webhookUrls = fetchSlackWebhookUrls()
     const message = formatMessageForSlack('weekly')
-    sendMessageToSlackChannel(message)
+    webhookUrls.forEach((webhookUrl) => {
+      sendMessageToSlackChannel(message, webhookUrl)
+    })
     saveWeeklyArticlesToSpreadsheet()
   } catch (e) {
     const subject = 'プロジェクト[dc_gform2sp]で、GASの実行中にエラーが発生しました。'

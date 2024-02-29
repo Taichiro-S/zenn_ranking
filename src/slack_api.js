@@ -1,14 +1,14 @@
-import { SLACK_WEBHOOK_URL, SLACK_APP_CLIENT_ID, SLACK_APP_CLIENT_SECRET } from './script_property'
+import { SLACK_APP_CLIENT_ID, SLACK_APP_CLIENT_SECRET } from './script_property'
 import { REDIRECT_URL } from './constants'
 
-export function sendMessageToSlackChannel(message) {
+export function sendMessageToSlackChannel(message, webhookUrl) {
   const payload = JSON.stringify(message)
   const options = {
     method: 'post',
     contentType: 'application/json',
     payload
   }
-  UrlFetchApp.fetch(SLACK_WEBHOOK_URL, options)
+  UrlFetchApp.fetch(webhookUrl, options)
 }
 
 export function slackAppOAuth(code) {
