@@ -148,9 +148,13 @@ export function fetchSlackWebhookUrls() {
     payload: JSON.stringify(payload),
     muteHttpExceptions: true
   }
-
-  const response = UrlFetchApp.fetch(url, options)
-  const jsonResponse = JSON.parse(response.getContentText())
+  let jsonResponse
+  try {
+    const response = UrlFetchApp.fetch(url, options)
+    jsonResponse = JSON.parse(response.getContentText())
+  } catch (error) {
+    console.error('エラーが発生しました:', error)
+  }
   const webhookUrls = jsonResponse.batch.entityResults.map((result) => result.entity.properties.webhookUrl.stringValue)
   return webhookUrls
 }
