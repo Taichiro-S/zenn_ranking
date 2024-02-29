@@ -11,39 +11,31 @@ export function sendMessageToSlackChannel(message) {
   UrlFetchApp.fetch(SLACK_WEBHOOK_URL, options)
 }
 
-export function doPost(e) {
-  const payload = JSON.parse(e.postData.contents)
-  const code = payload.code
+export function slackAppOAuth(code) {
+  try {
+    const res = UrlFetchApp.fetch('https://slack.com/api/oauth.v2.access', {
+      method: 'post',
+      payload: {
+        code,
+        client_id: SLACK_APP_CLIENT_ID,
+        client_secret: SLACK_APP_CLIENT_SECRET,
+        redirect_uri: REDIRECT_URL
+      }
+    })
 
-  const res = UrlFetchApp.fetch('https://slack.com/api/oauth.v2.access', {
-    method: 'post',
-    payload: {
-      code,
-      client_id: SLACK_APP_CLIENT_ID,
-      client_secret: SLACK_APP_CLIENT_SECRET,
-      redirect_uri: REDIRECT_URL
+    const resJson = JSON.parse(res.getContentText())
+    if (resJson.ok) {
+      const teamId = resJson.team.id
+      const appId = resJson.app_id
+      const redirectUrl = `https://slack.com/app_redirect?team=${teamId}&app=${appId}`
+      console.log(redirectUrl)
+      const template = HtmlService.createTemplateFromFile('auth_success')
+      template.redirectUrl = redirectUrl
+      return template.evaluate()
+    } else {
+      return HtmlService.createHtmlOutputFromFile('auth_fail')
     }
-  })
-
-  const resJson = JSON.parse(res.getContentText())
-
-  if (resJson.ok) {
-    const teamId = resJson.team.id
-    const appId = resJson.app_id
-    const redirectUrl = `https://slack.com/app_redirect?team=${teamId}&app=${appId}`
-
-    return ContentService.createTextOutput(
-      JSON.stringify({
-        ok: true,
-        redirectUrl
-      })
-    ).setMimeType(ContentService.MimeType.JSON)
-  } else {
-    return ContentService.createTextOutput(
-      JSON.stringify({
-        ok: false,
-        error: '認証に失敗しました。'
-      })
-    ).setMimeType(ContentService.MimeType.JSON)
+  } catch (error) {
+    return HtmlService.createHtmlOutputFromFile('auth_fail')
   }
 }
