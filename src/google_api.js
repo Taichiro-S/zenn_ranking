@@ -1,5 +1,5 @@
 import { fetchAndSortZennArticles } from './zenn_api'
-import { GCP_SERVICE_ACCOUNT_KEY } from './script_property'
+import { GCP_SERVICE_ACCOUNT_KEY, CLOUD_DATASTORE_TABLE_NAME } from './script_property'
 import { formatDate } from './utils'
 
 export function saveWeeklyArticlesToSpreadsheet() {
@@ -87,7 +87,7 @@ export function saveOAuthInfo(resJson) {
             path: [
               {
                 kind: 'SlackOAuthInfo',
-                name: 'OAuthInfo_' + resJson.team.id
+                name: CLOUD_DATASTORE_TABLE_NAME + resJson.team.id
               }
             ]
           },
@@ -158,6 +158,6 @@ export function fetchSlackWebhookUrls() {
   } catch (error) {
     console.error('エラーが発生しました3:', error)
   }
-  const webhookUrls = jsonResponse.batch.entityResults.map((result) => result.entity.properties.webhookUrl.stringValue)
+  const webhookUrls = jsonResponse.batch.entityResults.map((result) => result.entity.properties.webhook_url.stringValue)
   return webhookUrls
 }

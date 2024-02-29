@@ -30,12 +30,14 @@ jobs:
       - name: Generate ~/.clasprc.json
         run: |
           bash deployment/setup.sh
-      - name: Setup SCRIPT_ID
+      - name: Setup SCRIPT_ID & DEPLOY_ID
         run: |
           if [[ ${{ github.ref }} == 'refs/heads/main' ]]; then
             echo "SCRIPT_ID=${{ secrets.PRODUCTION_SCRIPT_ID }}" >> $GITHUB_ENV
+            echo "DEPLOY_ID=${{ secrets.PRODUCTION_DEPLOY_ID }}" >> $GITHUB_ENV
           elif [[ ${{ github.ref }} == 'refs/heads/stg' ]]; then
             echo "SCRIPT_ID=${{ secrets.STAGING_SCRIPT_ID }}" >> $GITHUB_ENV
+            echo "DEPLOY_ID=${{ secrets.STAGING_DEPLOY_ID }}" >> $GITHUB_ENV
           fi
       - name: Generate ~/.clasp.json
         run: |
@@ -51,4 +53,4 @@ jobs:
           echo y | clasp push
       - name: DEPLOY
         run: |
-          clasp deploy --deploymentId $DEPLOYMENT_ID
+          clasp deploy --deploymentId $DEPLOY_ID
