@@ -81,13 +81,15 @@ function distributeMonthlyRanking() {
 function distributeWeeklyRanking() {
   try {
     const webhookUrls = fetchSlackWebhookUrls()
+    console.log('webhookUrls:', webhookUrls)
     const message = formatMessageForSlack('weekly')
     webhookUrls.forEach((webhookUrl) => {
       sendMessageToSlackChannel(message, webhookUrl)
     })
     saveWeeklyArticlesToSpreadsheet()
   } catch (e) {
-    const subject = 'プロジェクト[dc_gform2sp]で、GASの実行中にエラーが発生しました。'
+    console.log('エラーが発生しました3:', e)
+    const subject = 'プロジェクト[Zennランキング]で、GASの実行中にエラーが発生しました。'
     const message = 'エラーメッセージ\n' + e.message + '\n' + 'スタックトレース\n' + e.stack
     MailApp.sendEmail(ADMIN_EMAIL, subject, message)
   }
