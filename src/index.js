@@ -15,7 +15,7 @@ global.doGet = doGet
 
 /**
  * slackのOAuth認証を行うためのリダイレクトで実行
- * トークンを
+ * トークン情報を取得してCloud Datastoreに保存する
  * @param {*} e
  * @returns
  */
@@ -43,11 +43,11 @@ function doGet(e) {
         template.redirectUrl = redirectUrl
         return template.evaluate()
       } else {
-        console.log('エラーが発生しました:', resJson)
+        console.log('エラーが発生しました1:', resJson)
         return HtmlService.createHtmlOutputFromFile('auth_fail')
       }
     } catch (error) {
-      console.log('エラーが発生しました:', error)
+      console.log('エラーが発生しました2:', error)
       return HtmlService.createHtmlOutputFromFile('auth_fail')
     }
   } else {

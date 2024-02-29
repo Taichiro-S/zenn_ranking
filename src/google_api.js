@@ -76,6 +76,8 @@ export function saveOAuthInfo(resJson) {
   const token = ScriptApp.getOAuthToken()
   const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
   const url = `https://datastore.googleapis.com/v1/projects/${projectId}:commit`
+  console.log('token:', token)
+  console.log('url:', url)
   const payload = {
     mode: 'NON_TRANSACTIONAL',
     mutations: [
