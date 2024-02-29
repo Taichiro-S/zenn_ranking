@@ -9,14 +9,16 @@
     <h1>認証に成功しました😊</h1>
     <p>アプリケーションを使用する準備ができました。</p>
     <script>
-      const urlParams = new URLSearchParams(window.location.search)
-      console.log('urlParams:', urlParams)
-      const code = urlParams.get('code')
+      //   const urlParams = new URLSearchParams(window.location.search)
+      //   console.log('urlParams:', urlParams)
+      //   const code = urlParams.get('code')
+      const code = '<?= code ?>'
       const scriptUrl =
         'https://script.google.com/macros/s/AKfycbzwus3arL2j-_a2Z0Et4AoeAXxGvKhSpV0JDA5in_kGs8n8j-2xuV1XEPHbwVJ1EuG9Zg/exec'
       //   const scriptUrl = `${window.location.origin}${window.location.pathname}`
       console.log('scriptUrl:', scriptUrl)
       console.log('code:', code)
+
       fetch(scriptUrl, {
         method: 'POST',
         body: JSON.stringify({ code: code }),

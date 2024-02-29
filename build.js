@@ -28,7 +28,7 @@ esbuild
 
     fs.copyFile(htmlSrcPath, htmlDestPath, (err) => {
       if (err) throw err
-      console.log('version.js was copied to dist directory.')
+      console.log('index.html was copied to dist directory.')
     })
   })
   .catch((e) => {

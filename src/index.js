@@ -15,7 +15,18 @@ global.doGet = doGet
  */
 
 function doGet(e) {
-  return HtmlService.createHtmlOutputFromFile('index')
+  // URLパラメータからcodeを取得
+  const code = e.parameter.code
+
+  // HTMLテンプレートを取得
+  const template = HtmlService.createTemplateFromFile('index')
+
+  // codeをテンプレートに渡す
+  template.code = code
+
+  // HTMLテンプレートを評価して出力
+  return template.evaluate()
+  // return HtmlService.createHtmlOutputFromFile('index')
 }
 
 function distributeMonthlyRanking() {
