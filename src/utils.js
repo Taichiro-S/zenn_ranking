@@ -1,3 +1,5 @@
+import { TIME_PERIOD } from './constants'
+
 /**
  * Date型からHH:mm形式に変換
  * @param {Date} date
@@ -25,4 +27,16 @@ export function formatDate(date) {
     return res.slice(1, res.length)
   }
   return res
+}
+
+export function getTimePeriod(period) {
+  const today = new Date()
+  let start
+  const end = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1)
+  if (period === TIME_PERIOD.WEEKLY) {
+    start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 8)
+  } else if (period === TIME_PERIOD.MONTHLY) {
+    start = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+  }
+  return { start: formatDate(start), end: formatDate(end) }
 }

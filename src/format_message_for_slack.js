@@ -1,22 +1,8 @@
-import { fetchAndSortZennArticles } from './zenn_api'
-import { formatDate, escapeMarkdownSpecialChars } from './utils'
+import { formatDate, escapeMarkdownSpecialChars, getTimePeriod } from './utils'
 
-export function formatMessageForSlack(period) {
-  let articles = []
-  const today = new Date()
-  let start = ''
-  let end = ''
-  if (period === 'weekly') {
-    articles = fetchAndSortZennArticles('weekly')
-    start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7)
-    end = new Date(today)
-  } else if (period === 'monthly') {
-    articles = fetchAndSortZennArticles('monthly')
-    start = new Date(today.getFullYear(), today.getMonth() - 1, 1)
-    end = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1)
-  }
-  const formattedEndDate = formatDate(end)
-  const formattedStartDate = formatDate(start)
+export function formatMessageForSlack(period, articles) {
+  const { start, end } = getTimePeriod(period)
+
   const message = {
     blocks: [
       {
@@ -24,7 +10,7 @@ export function formatMessageForSlack(period) {
         elements: [
           {
             type: 'mrkdwn',
-            text: `${formattedStartDate} ~ ${formattedEndDate} のランキングです`
+            text: `${start} ~ ${end} のランキングです`
           }
         ]
       }
@@ -35,11 +21,10 @@ export function formatMessageForSlack(period) {
   articlestest.forEach((article) => {
     const title = `*<${article.url || ''}|${escapeMarkdownSpecialChars(article.title)}>*\n`
     const author = `*<${article.userLink || ''}|${escapeMarkdownSpecialChars(article.username)}>*\n`
-    const publisheDate = new Date(article.publishedAt)
-    const formattedPublishDate = formatDate(publisheDate)
+    const publisheDate = formatDate(new Date(article.publishedAt))
     let topics = ''
     for (const topic of article.topics) {
-      topics += '`' + topic + '`, '
+      topics += '`' + topic + '` '
     }
     let emoji = ''
     switch (rank) {
@@ -57,7 +42,7 @@ export function formatMessageForSlack(period) {
       type: 'header',
       text: {
         type: 'plain_text',
-        text: `${emoji}${rank}位`,
+        text: `${emoji}第${rank}位`,
         emoji: true
       }
     })
@@ -89,7 +74,7 @@ export function formatMessageForSlack(period) {
       fields: [
         {
           type: 'mrkdwn',
-          text: `*公開日:* \n${formattedPublishDate}`
+          text: `*公開日:* \n${publisheDate}`
         },
         {
           type: 'mrkdwn',
@@ -103,6 +88,49 @@ export function formatMessageForSlack(period) {
     })
 
     rank += 1
+  })
+
+  return message
+}
+
+export function formatErrorMessageForSlack(e, projectName) {
+  const message = {
+    blocks: [
+      {
+        type: 'context',
+        elements: [
+          {
+            type: 'mrkdwn',
+            text: `${projectName}でエラーが発生しました`
+          }
+        ]
+      }
+    ]
+  }
+
+  message.blocks.push({
+    type: 'header',
+    text: {
+      type: 'plain_text',
+      text: e.message,
+      emoji: true
+    }
+  })
+
+  message.blocks.push({
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text: '*エラーログ*'
+    }
+  })
+
+  message.blocks.push({
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text: '```' + e.stack + '```'
+    }
   })
 
   return message

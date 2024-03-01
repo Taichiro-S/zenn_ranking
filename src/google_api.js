@@ -1,16 +1,13 @@
 import { fetchAndSortZennArticles } from './zenn_api'
 import { GCP_SERVICE_ACCOUNT_KEY, CLOUD_DATASTORE_TABLE_NAME } from './script_property'
-import { formatDate } from './utils'
+import { formatDate, getTimePeriod } from './utils'
+import { DATA_TO_SHOW_IN_SPREADSHEET } from './constants'
 
-export function saveWeeklyArticlesToSpreadsheet() {
+function saveArticlesToSpreadsheet(period) {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
-  const today = new Date()
-  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7)
-  const end = new Date(today)
-  const formattedDate = Utilities.formatDate(today, Session.getScriptTimeZone(), 'yyyy/MM/dd')
-  const formattedStartDate = formatDate(start)
-  const formattedEndDate = formatDate(end)
-  const sheetName = `${formattedDate}_週間ランキング(${formattedStartDate} ~ ${formattedEndDate})`
+  const { start, end } = getTimePeriod(period)
+  const title = period === 'weekly' ? '週間' : '月間'
+  const sheetName = `${title}ランキング(${start} ~ ${end})`
   let sheet = spreadsheet.getSheetByName(sheetName)
   if (!sheet) {
     sheet = spreadsheet.insertSheet(sheetName)
@@ -18,9 +15,10 @@ export function saveWeeklyArticlesToSpreadsheet() {
     sheet.clear()
   }
 
-  const articles = fetchAndSortZennArticles('weekly')
+  const articles = fetchAndSortZennArticles(period)
 
-  const data = [['タイトル', '記事URL', '著者名', '著者URL', 'いいね数', '公開日', 'トピック']]
+  const data = []
+  data.push(DATA_TO_SHOW_IN_SPREADSHEET)
 
   articles.forEach((article) => {
     data.push([
@@ -37,39 +35,12 @@ export function saveWeeklyArticlesToSpreadsheet() {
   sheet.getRange(1, 1, data.length, data[0].length).setValues(data)
 }
 
+export function saveWeeklyArticlesToSpreadsheet() {
+  saveArticlesToSpreadsheet('weekly')
+}
+
 export function saveMonthlyArticlesToSpreadsheet() {
-  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
-  const today = new Date()
-  const start = new Date(today.getFullYear(), today.getMonth(), 1)
-  const end = new Date(today)
-  const formattedDate = Utilities.formatDate(today, Session.getScriptTimeZone(), 'yyyy/MM/dd')
-  const formattedStartDate = formatDate(start)
-  const formattedEndDate = formatDate(end)
-  const sheetName = `${formattedDate}_月間ランキング(${formattedStartDate} ~ ${formattedEndDate})`
-
-  let sheet = spreadsheet.getSheetByName(sheetName)
-  if (!sheet) {
-    sheet = spreadsheet.insertSheet(sheetName)
-  } else {
-    sheet.clear()
-  }
-
-  const articles = fetchAndSortZennArticles('monthly')
-
-  const data = [['タイトル', '記事URL', '著者名', '著者URL', 'いいね数', '公開日', 'トピック']]
-
-  articles.forEach((article) => {
-    data.push([
-      article.title,
-      article.url,
-      article.username,
-      article.userLink,
-      article.likedCount,
-      formatDate(new Date(article.publishedAt)),
-      article.topics.join(',')
-    ])
-  })
-  sheet.getRange(1, 1, data.length, data[0].length).setValues(data)
+  saveArticlesToSpreadsheet('monthly')
 }
 
 export function saveOAuthInfo(resJson) {
@@ -156,7 +127,7 @@ export function fetchSlackWebhookUrls() {
     const response = UrlFetchApp.fetch(url, options)
     jsonResponse = JSON.parse(response.getContentText())
   } catch (error) {
-    console.error('エラーが発生しました3:', error)
+    console.error('エラーが発生しました:', error)
   }
   const webhookUrls = jsonResponse.batch.entityResults.map((result) => result.entity.properties.webhook_url.stringValue)
   return webhookUrls
