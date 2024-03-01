@@ -1,22 +1,12 @@
-import { fetchAndSortZennArticles } from './zenn_api'
-import { formatDate, escapeMarkdownSpecialChars } from './utils'
+import { formatDate, escapeMarkdownSpecialChars, getTimePeriod } from './utils'
+import { FULL_RANKING_RESULT } from './constants'
+export function formatMessageForSlack(period, articles) {
+  const now = new Date()
+  const { start, end } = getTimePeriod(now, period)
 
-export function formatMessageForSlack(period) {
-  let articles = []
-  const today = new Date()
-  let start = ''
-  let end = ''
-  if (period === 'weekly') {
-    articles = fetchAndSortZennArticles('weekly')
-    start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7)
-    end = new Date(today)
-  } else if (period === 'monthly') {
-    articles = fetchAndSortZennArticles('monthly')
-    start = new Date(today.getFullYear(), today.getMonth() - 1, 1)
-    end = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1)
-  }
-  const formattedEndDate = formatDate(end)
-  const formattedStartDate = formatDate(start)
+  const formattedStart = formatDate(start)
+  const formattedEnd = formatDate(end)
+
   const message = {
     blocks: [
       {
@@ -24,7 +14,7 @@ export function formatMessageForSlack(period) {
         elements: [
           {
             type: 'mrkdwn',
-            text: `${formattedStartDate} ~ ${formattedEndDate} のランキングです`
+            text: `${formattedStart} ~ ${formattedEnd} のランキングです`
           }
         ]
       }
@@ -32,16 +22,16 @@ export function formatMessageForSlack(period) {
   }
   let rank = 1
   const articlestest = articles.slice(0, 3)
+  const linkForFullRanking = `<${escapeMarkdownSpecialChars(FULL_RANKING_RESULT)}|こちら>`
   articlestest.forEach((article) => {
-    const title = `*<${article.url || ''}|${escapeMarkdownSpecialChars(article.title)}>*\n`
-    const author = `*<${article.userLink || ''}|${escapeMarkdownSpecialChars(article.username)}>*\n`
-    const publisheDate = new Date(article.publishedAt)
-    const formattedPublishDate = formatDate(publisheDate)
+    const title = `*<${article.url || ''}|${escapeMarkdownSpecialChars(article.title)}>*`
+    const author = `*<${article.userLink || ''}|${escapeMarkdownSpecialChars(article.username)}>*`
+    const publisheDate = formatDate(new Date(article.publishedAt))
     let topics = ''
     for (const topic of article.topics) {
-      topics += '`' + topic + '`, '
+      topics += '`' + topic + '` '
     }
-    let emoji = ''
+    let emoji
     switch (rank) {
       case 1:
         emoji = ':first_place_medal:'
@@ -52,12 +42,14 @@ export function formatMessageForSlack(period) {
       case 3:
         emoji = ':third_place_medal:'
         break
+      default:
+        emoji = ''
     }
     message.blocks.push({
       type: 'header',
       text: {
         type: 'plain_text',
-        text: `${emoji}${rank}位`,
+        text: `${emoji}第${rank}位`,
         emoji: true
       }
     })
@@ -66,7 +58,12 @@ export function formatMessageForSlack(period) {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: title
+        text: `${title}\n` + '```' + `${article.body}` + '```'
+      },
+      accessory: {
+        type: 'image',
+        image_url: article.avatar,
+        alt_text: 'No Image'
       }
     })
 
@@ -75,11 +72,11 @@ export function formatMessageForSlack(period) {
       fields: [
         {
           type: 'mrkdwn',
-          text: `*著者:* \n${author}`
+          text: `*著者:*  ${author}`
         },
         {
           type: 'mrkdwn',
-          text: `*いいね数:* \n${article.likedCount}`
+          text: `*いいね数:* ${article.likedCount}`
         }
       ]
     })
@@ -89,11 +86,11 @@ export function formatMessageForSlack(period) {
       fields: [
         {
           type: 'mrkdwn',
-          text: `*公開日:* \n${formattedPublishDate}`
+          text: `*公開日:* ${publisheDate}`
         },
         {
           type: 'mrkdwn',
-          text: `*トピック:* \n${topics}`
+          text: `*トピック:* ${topics}`
         }
       ]
     })
@@ -103,6 +100,57 @@ export function formatMessageForSlack(period) {
     })
 
     rank += 1
+  })
+
+  message.blocks.push({
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text: `ランキングの続きは${linkForFullRanking}から`
+    }
+  })
+
+  return message
+}
+
+export function formatErrorMessageForSlack(e, projectName) {
+  const message = {
+    blocks: [
+      {
+        type: 'context',
+        elements: [
+          {
+            type: 'mrkdwn',
+            text: `${projectName}でエラーが発生しました`
+          }
+        ]
+      }
+    ]
+  }
+
+  message.blocks.push({
+    type: 'header',
+    text: {
+      type: 'plain_text',
+      text: e.message,
+      emoji: true
+    }
+  })
+
+  message.blocks.push({
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text: '*エラーログ*'
+    }
+  })
+
+  message.blocks.push({
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text: '```' + e.stack + '```'
+    }
   })
 
   return message

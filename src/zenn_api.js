@@ -3,20 +3,18 @@ import {
   MONTHLY_RANKING_COUNT,
   ZENN_ARTICLE_API_ENDPOINT,
   MIN_LIKED_COUNT,
-  ZENN_URL
+  ZENN_URL,
+  TIME_PERIOD
 } from './constants'
+import { extractBobyText } from './utils'
 
 export function fetchAndSortZennArticles(period) {
   const today = new Date()
-  let start = ''
-  let cutoff = 0
-  if (period === 'weekly') {
-    start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7)
-    cutoff = WEEKLY_RANKING_COUNT
-  } else if (period === 'monthly') {
-    start = new Date(today.getFullYear(), today.getMonth() - 1, 1)
-    cutoff = MONTHLY_RANKING_COUNT
-  }
+  const start =
+    period === TIME_PERIOD.WEEKLY
+      ? new Date(today.getFullYear(), today.getMonth(), today.getDate() - 8)
+      : new Date(today.getFullYear(), today.getMonth() - 1, 1)
+  const cutoff = TIME_PERIOD.WEEKLY ? WEEKLY_RANKING_COUNT : MONTHLY_RANKING_COUNT
 
   let keepFetching = true
   let nextPage = 1
@@ -65,19 +63,22 @@ export function fetchAndSortZennArticles(period) {
   }
 
   const articleWithTopics = sortedArticles.map((article) => {
-    const topics = fetchTopics(article)
-    article.topics = topics
+    const { topicNames, bodyText } = fetchArticleDetails(article.slug)
+    article.topics = topicNames
+    article.body = bodyText
     return article
   })
 
   return articleWithTopics
 }
 
-function fetchTopics(article) {
-  const url = `${ZENN_ARTICLE_API_ENDPOINT}/${article.slug}`
+function fetchArticleDetails(slug) {
+  const url = `${ZENN_ARTICLE_API_ENDPOINT}/${slug}`
   const response = UrlFetchApp.fetch(url)
   const data = JSON.parse(response.getContentText())
   const topics = data.article.topics || []
+  const bodyHtml = data.article.body_html || ''
   const topicNames = topics.map((topic) => topic.name)
-  return topicNames
+  const bodyText = extractBobyText(bodyHtml)
+  return { topicNames, bodyText }
 }

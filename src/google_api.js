@@ -1,16 +1,20 @@
 import { fetchAndSortZennArticles } from './zenn_api'
-import { GCP_SERVICE_ACCOUNT_KEY, CLOUD_DATASTORE_TABLE_NAME } from './script_property'
-import { formatDate } from './utils'
+import {
+  GCP_SERVICE_ACCOUNT_KEY,
+  CLOUD_DATASTORE_TABLE_FOR_ARTICLES,
+  CLOUD_DATASTORE_TABLE_FOR_OAUTH
+} from './script_property'
+import { formatDate, getTimePeriod } from './utils'
+import { DATA_TO_SHOW_IN_SPREADSHEET, TIME_PERIOD, GOOGLE_DATASTORE_API_ENDPOINT } from './constants'
 
-export function saveWeeklyArticlesToSpreadsheet() {
+function saveArticlesToSpreadsheet(period) {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
-  const today = new Date()
-  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7)
-  const end = new Date(today)
-  const formattedDate = Utilities.formatDate(today, Session.getScriptTimeZone(), 'yyyy/MM/dd')
-  const formattedStartDate = formatDate(start)
-  const formattedEndDate = formatDate(end)
-  const sheetName = `${formattedDate}_週間ランキング(${formattedStartDate} ~ ${formattedEndDate})`
+  const now = new Date()
+  const { start, end } = getTimePeriod(now, period)
+  const formattedStart = formatDate(start)
+  const formattedEnd = formatDate(end)
+  const title = period === TIME_PERIOD.WEEKLY ? '週間' : '月間'
+  const sheetName = `${title}ランキング(${formattedStart} ~ ${formattedEnd})`
   let sheet = spreadsheet.getSheetByName(sheetName)
   if (!sheet) {
     sheet = spreadsheet.insertSheet(sheetName)
@@ -18,9 +22,10 @@ export function saveWeeklyArticlesToSpreadsheet() {
     sheet.clear()
   }
 
-  const articles = fetchAndSortZennArticles('weekly')
+  const articles = fetchAndSortZennArticles(period)
 
-  const data = [['タイトル', '記事URL', '著者名', '著者URL', 'いいね数', '公開日', 'トピック']]
+  const data = []
+  data.push(DATA_TO_SHOW_IN_SPREADSHEET)
 
   articles.forEach((article) => {
     data.push([
@@ -37,47 +42,18 @@ export function saveWeeklyArticlesToSpreadsheet() {
   sheet.getRange(1, 1, data.length, data[0].length).setValues(data)
 }
 
+export function saveWeeklyArticlesToSpreadsheet() {
+  saveArticlesToSpreadsheet(TIME_PERIOD.WEEKLY)
+}
+
 export function saveMonthlyArticlesToSpreadsheet() {
-  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
-  const today = new Date()
-  const start = new Date(today.getFullYear(), today.getMonth(), 1)
-  const end = new Date(today)
-  const formattedDate = Utilities.formatDate(today, Session.getScriptTimeZone(), 'yyyy/MM/dd')
-  const formattedStartDate = formatDate(start)
-  const formattedEndDate = formatDate(end)
-  const sheetName = `${formattedDate}_月間ランキング(${formattedStartDate} ~ ${formattedEndDate})`
-
-  let sheet = spreadsheet.getSheetByName(sheetName)
-  if (!sheet) {
-    sheet = spreadsheet.insertSheet(sheetName)
-  } else {
-    sheet.clear()
-  }
-
-  const articles = fetchAndSortZennArticles('monthly')
-
-  const data = [['タイトル', '記事URL', '著者名', '著者URL', 'いいね数', '公開日', 'トピック']]
-
-  articles.forEach((article) => {
-    data.push([
-      article.title,
-      article.url,
-      article.username,
-      article.userLink,
-      article.likedCount,
-      formatDate(new Date(article.publishedAt)),
-      article.topics.join(',')
-    ])
-  })
-  sheet.getRange(1, 1, data.length, data[0].length).setValues(data)
+  saveArticlesToSpreadsheet(TIME_PERIOD.MONTHLY)
 }
 
 export function saveOAuthInfo(resJson) {
   const token = ScriptApp.getOAuthToken()
   const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
-  const url = `https://datastore.googleapis.com/v1/projects/${projectId}:commit`
-  console.log('token:', token)
-  console.log('url:', url)
+  const url = `${GOOGLE_DATASTORE_API_ENDPOINT}/${projectId}:commit`
   const payload = {
     mode: 'NON_TRANSACTIONAL',
     mutations: [
@@ -86,7 +62,7 @@ export function saveOAuthInfo(resJson) {
           key: {
             path: [
               {
-                kind: CLOUD_DATASTORE_TABLE_NAME,
+                kind: CLOUD_DATASTORE_TABLE_FOR_OAUTH,
                 name: 'SlackOAuthInfo_' + resJson.team.id
               }
             ]
@@ -116,20 +92,67 @@ export function saveOAuthInfo(resJson) {
     payload: JSON.stringify(payload),
     muteHttpExceptions: true
   }
+  UrlFetchApp.fetch(url, options)
+}
 
-  const response = UrlFetchApp.fetch(url, options)
-  Logger.log(response.getContentText())
+export function saveArticleRanking(articles, period) {
+  const token = ScriptApp.getOAuthToken()
+  const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
+  const url = `${GOOGLE_DATASTORE_API_ENDPOINT}/${projectId}:commit`
+  const savedAt = new Date().toISOString()
+  const payload = {
+    mode: 'NON_TRANSACTIONAL',
+    mutations: articles.map((article) => {
+      const savedAtSlug = `${savedAt}-${article.slug}`
+      return {
+        upsert: {
+          key: {
+            partitionId: { projectId },
+            path: [{ kind: CLOUD_DATASTORE_TABLE_FOR_ARTICLES, name: savedAtSlug }]
+          },
+          properties: {
+            title: { stringValue: article.title },
+            url: { stringValue: article.url },
+            publishedAt: { stringValue: article.publishedAt },
+            likedCount: { integerValue: article.likedCount.toString() },
+            emoji: { stringValue: article.emoji },
+            username: { stringValue: article.username },
+            userLink: { stringValue: article.userLink },
+            avatar: { stringValue: article.avatar },
+            topics: {
+              arrayValue: {
+                values: article.topics.map((topic) => ({ stringValue: topic }))
+              }
+            },
+            body: { stringValue: article.body },
+            savedAt: { stringValue: savedAt },
+            period: { stringValue: period }
+          }
+        }
+      }
+    })
+  }
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    headers: {
+      Authorization: 'Bearer ' + token
+    },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  }
+  UrlFetchApp.fetch(url, options)
 }
 
 export function fetchSlackWebhookUrls() {
   const token = ScriptApp.getOAuthToken()
   const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
-  const url = `https://datastore.googleapis.com/v1/projects/${projectId}:runQuery`
+  const url = `${GOOGLE_DATASTORE_API_ENDPOINT}/${projectId}:runQuery`
   const payload = {
     query: {
       kind: [
         {
-          name: CLOUD_DATASTORE_TABLE_NAME
+          name: CLOUD_DATASTORE_TABLE_FOR_OAUTH
         }
       ],
       projection: [
@@ -151,13 +174,8 @@ export function fetchSlackWebhookUrls() {
     payload: JSON.stringify(payload),
     muteHttpExceptions: true
   }
-  let jsonResponse
-  try {
-    const response = UrlFetchApp.fetch(url, options)
-    jsonResponse = JSON.parse(response.getContentText())
-  } catch (error) {
-    console.error('エラーが発生しました3:', error)
-  }
+  const response = UrlFetchApp.fetch(url, options)
+  const jsonResponse = JSON.parse(response.getContentText())
   const webhookUrls = jsonResponse.batch.entityResults.map((result) => result.entity.properties.webhook_url.stringValue)
   return webhookUrls
 }

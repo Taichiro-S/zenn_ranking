@@ -15,7 +15,6 @@ jobs:
       REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-      DEPLOYMENT_ID: ${{ secrets.DEPLOYMENT_ID }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3

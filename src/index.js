@@ -1,12 +1,14 @@
-import { ADMIN_EMAIL, SLACK_APP_CLIENT_ID, SLACK_APP_CLIENT_SECRET, REDIRECT_URL } from './script_property'
-import { formatMessageForSlack } from './format_message_for_slack'
-import { sendMessageToSlackChannel } from './slack_api'
 import {
-  saveMonthlyArticlesToSpreadsheet,
-  saveWeeklyArticlesToSpreadsheet,
-  fetchSlackWebhookUrls,
-  saveOAuthInfo
-} from './google_api'
+  SLACK_APP_CLIENT_ID,
+  SLACK_APP_CLIENT_SECRET,
+  REDIRECT_URL,
+  SLACK_WEBHOOK_URL_FOR_ERROR_LOG
+} from './script_property'
+import { formatErrorMessageForSlack, formatMessageForSlack } from './format_message_for_slack'
+import { sendMessageToSlackChannel } from './slack_api'
+import { fetchSlackWebhookUrls, saveOAuthInfo, saveArticleRanking } from './google_api'
+import { SLACK_OAUTH_SUCCESS_PAGE, SLACK_OAUTH_FAIL_PAGE, TIME_PERIOD } from './constants'
+import { fetchAndSortZennArticles } from './zenn_api'
 
 // GASから関数を呼び出すために、グローバル変数に登録する
 global.distributeMonthlyRanking = distributeMonthlyRanking
@@ -39,20 +41,20 @@ function doGet(e) {
         const teamId = resJson.team.id
         const appId = resJson.app_id
         const redirectUrl = `https://slack.com/app_redirect?team=${teamId}&app=${appId}`
-        const template = HtmlService.createTemplateFromFile('auth_success')
+        const template = HtmlService.createTemplateFromFile(SLACK_OAUTH_SUCCESS_PAGE)
         template.redirectUrl = redirectUrl
         return template.evaluate()
       } else {
-        console.log('エラーが発生しました1:', resJson)
-        return HtmlService.createHtmlOutputFromFile('auth_fail')
+        console.error('Slack OAuth認証中にエラーが発生しました:', resJson)
+        return HtmlService.createHtmlOutputFromFile(SLACK_OAUTH_FAIL_PAGE)
       }
     } catch (error) {
-      console.log('エラーが発生しました2:', error)
-      return HtmlService.createHtmlOutputFromFile('auth_fail')
+      console.error('Slack OAuth認証中にエラーが発生しました:', error)
+      return HtmlService.createHtmlOutputFromFile(SLACK_OAUTH_FAIL_PAGE)
     }
   } else {
-    console.log('codeがありません')
-    return HtmlService.createHtmlOutputFromFile('auth_fail')
+    console.error('codeが取得できませんでした')
+    return HtmlService.createHtmlOutputFromFile(SLACK_OAUTH_FAIL_PAGE)
   }
 }
 
@@ -62,15 +64,17 @@ function doGet(e) {
 function distributeMonthlyRanking() {
   try {
     const webhookUrls = fetchSlackWebhookUrls()
-    const message = formatMessageForSlack('monthly')
+    const articles = fetchAndSortZennArticles(TIME_PERIOD.MONTHLY)
+    const message = formatMessageForSlack(TIME_PERIOD.MONTHLY, articles)
     webhookUrls.forEach((webhookUrl) => {
       sendMessageToSlackChannel(message, webhookUrl)
     })
-    saveMonthlyArticlesToSpreadsheet()
+    saveArticleRanking(articles, TIME_PERIOD.MONTHLY)
   } catch (e) {
-    const subject = 'プロジェクト[Zennランキング]で、GASの実行中にエラーが発生しました。'
-    const message = 'エラーメッセージ\n' + e.message + '\n' + 'スタックトレース\n' + e.stack
-    MailApp.sendEmail(ADMIN_EMAIL, subject, message)
+    sendMessageToSlackChannel(
+      formatErrorMessageForSlack(e, 'Zennの月間ランキング送信処理'),
+      SLACK_WEBHOOK_URL_FOR_ERROR_LOG
+    )
   }
 }
 
@@ -81,16 +85,16 @@ function distributeMonthlyRanking() {
 function distributeWeeklyRanking() {
   try {
     const webhookUrls = fetchSlackWebhookUrls()
-    console.log('webhookUrls:', webhookUrls)
-    const message = formatMessageForSlack('weekly')
+    const articles = fetchAndSortZennArticles(TIME_PERIOD.WEEKLY)
+    const message = formatMessageForSlack(TIME_PERIOD.WEEKLY, articles)
     webhookUrls.forEach((webhookUrl) => {
       sendMessageToSlackChannel(message, webhookUrl)
     })
-    saveWeeklyArticlesToSpreadsheet()
+    saveArticleRanking(articles, TIME_PERIOD.WEEKLY)
   } catch (e) {
-    console.log('エラーが発生しました3:', e)
-    const subject = 'プロジェクト[Zennランキング]で、GASの実行中にエラーが発生しました。'
-    const message = 'エラーメッセージ\n' + e.message + '\n' + 'スタックトレース\n' + e.stack
-    MailApp.sendEmail(ADMIN_EMAIL, subject, message)
+    sendMessageToSlackChannel(
+      formatErrorMessageForSlack(e, 'Zennの週間ランキング送信処理'),
+      SLACK_WEBHOOK_URL_FOR_ERROR_LOG
+    )
   }
 }

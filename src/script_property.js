@@ -3,16 +3,15 @@ const scriptProperties = PropertiesService.getScriptProperties()
 
 /**
  * 管理者のGメール
- * エラー時のメールの送信先とカレンダーの共有先
  * @type {string}
  */
 export const ADMIN_EMAIL = scriptProperties.getProperty('ADMIN_EMAIL')
 
 /**
- * 連携しているslackアプリのwebhook url
+ * エラーログ送信用のslackチャンネルのwebhook url
  * @type {string}
  */
-export const SLACK_WEBHOOK_URL = scriptProperties.getProperty('SLACK_WEBHOOK_URL')
+export const SLACK_WEBHOOK_URL_FOR_ERROR_LOG = scriptProperties.getProperty('SLACK_WEBHOOK_URL_FOR_ERROR_LOG')
 
 /**
  * slackアプリのclient id
@@ -37,10 +36,18 @@ export const GCP_SERVICE_ACCOUNT_KEY = JSON.parse(scriptProperties.getProperty('
  * テスト用スクリプトと本番用スクリプトで異なる名前にする
  * @type {string}
  */
-export const CLOUD_DATASTORE_TABLE_NAME = scriptProperties.getProperty('CLOUD_DATASTORE_TABLE_NAME')
+export const CLOUD_DATASTORE_TABLE_FOR_OAUTH = scriptProperties.getProperty('CLOUD_DATASTORE_TABLE_FOR_OAUTH')
+
+/**
+ * 記事のランキングのデータを保存するデータベースのテーブル名
+ * テスト用スクリプトと本番用スクリプトで異なる名前にする
+ * @type {string}
+ */
+export const CLOUD_DATASTORE_TABLE_FOR_ARTICLES = scriptProperties.getProperty('CLOUD_DATASTORE_TABLE_FOR_ARTICLES')
 
 /**
  * slackのOAuth認証のリダイレクトURL
+ * テスト用と本番用でデプロイしたそれぞれのアプリのURLにする
  * @type {string}
  */
 export const REDIRECT_URL = scriptProperties.getProperty('REDIRECT_URL')
