@@ -1,5 +1,9 @@
 import { fetchAndSortZennArticles } from './zenn_api'
-import { GCP_SERVICE_ACCOUNT_KEY, CLOUD_DATASTORE_TABLE_NAME } from './script_property'
+import {
+  GCP_SERVICE_ACCOUNT_KEY,
+  CLOUD_DATASTORE_TABLE_FOR_ARTICLES,
+  CLOUD_DATASTORE_TABLE_FOR_OAUTH
+} from './script_property'
 import { formatDate, getTimePeriod } from './utils'
 import { DATA_TO_SHOW_IN_SPREADSHEET, TIME_PERIOD, GOOGLE_DATASTORE_API_ENDPOINT } from './constants'
 
@@ -58,7 +62,7 @@ export function saveOAuthInfo(resJson) {
           key: {
             path: [
               {
-                kind: CLOUD_DATASTORE_TABLE_NAME,
+                kind: CLOUD_DATASTORE_TABLE_FOR_OAUTH,
                 name: 'SlackOAuthInfo_' + resJson.team.id
               }
             ]
@@ -88,9 +92,59 @@ export function saveOAuthInfo(resJson) {
     payload: JSON.stringify(payload),
     muteHttpExceptions: true
   }
+  UrlFetchApp.fetch(url, options)
+}
 
-  const response = UrlFetchApp.fetch(url, options)
-  Logger.log(response.getContentText())
+export function saveArticleRanking(articles) {
+  const token = ScriptApp.getOAuthToken()
+  const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
+  const url = `${GOOGLE_DATASTORE_API_ENDPOINT}/${projectId}:commit`
+  const savedAt = new Date().toISOString()
+
+  const articlesProperty = articles.map((article) => ({
+    mapValue: {
+      fields: {
+        title: { stringValue: article.title },
+        url: { stringValue: article.url },
+        slug: { stringValue: article.slug },
+        publishedAt: { stringValue: article.publishedAt },
+        likedCount: { integerValue: article.likedCount.toString() }, // Datastoreの整数は文字列として扱う
+        emoji: { stringValue: article.emoji },
+        username: { stringValue: article.username },
+        userLink: { stringValue: article.userLink },
+        avatar: { stringValue: article.avatar }
+      }
+    }
+  }))
+
+  const payload = {
+    mode: 'NON_TRANSACTIONAL',
+    mutations: [
+      {
+        insert: {
+          key: {
+            partitionId: { projectId },
+            path: [{ CLOUD_DATASTORE_TABLE_FOR_ARTICLES, name: `savedAt-${savedAt}` }] // savedAtをキーの一部として使用
+          },
+          properties: {
+            savedAt: { stringValue: savedAt },
+            articles: { arrayValue: { values: articlesProperty } }
+          }
+        }
+      }
+    ]
+  }
+
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    headers: {
+      Authorization: 'Bearer ' + token
+    },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  }
+  UrlFetchApp.fetch(url, options)
 }
 
 export function fetchSlackWebhookUrls() {
@@ -101,7 +155,7 @@ export function fetchSlackWebhookUrls() {
     query: {
       kind: [
         {
-          name: CLOUD_DATASTORE_TABLE_NAME
+          name: CLOUD_DATASTORE_TABLE_FOR_OAUTH
         }
       ],
       projection: [

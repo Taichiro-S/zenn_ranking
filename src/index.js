@@ -7,10 +7,11 @@ import {
 import { formatErrorMessageForSlack, formatMessageForSlack } from './format_message_for_slack'
 import { sendMessageToSlackChannel } from './slack_api'
 import {
-  saveMonthlyArticlesToSpreadsheet,
-  saveWeeklyArticlesToSpreadsheet,
+  // saveMonthlyArticlesToSpreadsheet,
+  // saveWeeklyArticlesToSpreadsheet,
   fetchSlackWebhookUrls,
-  saveOAuthInfo
+  saveOAuthInfo,
+  saveArticleRanking
 } from './google_api'
 import { SLACK_OAUTH_SUCCESS_PAGE, SLACK_OAUTH_FAIL_PAGE, TIME_PERIOD } from './constants'
 import { fetchAndSortZennArticles } from './zenn_api'
@@ -74,7 +75,8 @@ function distributeMonthlyRanking() {
     webhookUrls.forEach((webhookUrl) => {
       sendMessageToSlackChannel(message, webhookUrl)
     })
-    saveMonthlyArticlesToSpreadsheet()
+    // saveMonthlyArticlesToSpreadsheet()
+    saveArticleRanking(articles)
   } catch (e) {
     sendMessageToSlackChannel(
       formatErrorMessageForSlack(e, 'Zennの月間ランキング送信処理'),
@@ -95,7 +97,8 @@ function distributeWeeklyRanking() {
     webhookUrls.forEach((webhookUrl) => {
       sendMessageToSlackChannel(message, webhookUrl)
     })
-    saveWeeklyArticlesToSpreadsheet()
+    // saveWeeklyArticlesToSpreadsheet()
+    saveArticleRanking(articles)
   } catch (e) {
     sendMessageToSlackChannel(
       formatErrorMessageForSlack(e, 'Zennの週間ランキング送信処理'),

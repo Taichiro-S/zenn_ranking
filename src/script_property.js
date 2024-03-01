@@ -36,7 +36,14 @@ export const GCP_SERVICE_ACCOUNT_KEY = JSON.parse(scriptProperties.getProperty('
  * テスト用スクリプトと本番用スクリプトで異なる名前にする
  * @type {string}
  */
-export const CLOUD_DATASTORE_TABLE_NAME = scriptProperties.getProperty('CLOUD_DATASTORE_TABLE_NAME')
+export const CLOUD_DATASTORE_TABLE_FOR_OAUTH = scriptProperties.getProperty('CLOUD_DATASTORE_TABLE_FOR_OAUTH')
+
+/**
+ * 記事のランキングのデータを保存するデータベースのテーブル名
+ * テスト用スクリプトと本番用スクリプトで異なる名前にする
+ * @type {string}
+ */
+export const CLOUD_DATASTORE_TABLE_FOR_ARTICLES = scriptProperties.getProperty('CLOUD_DATASTORE_TABLE_FOR_ARTICLES')
 
 /**
  * slackのOAuth認証のリダイレクトURL
