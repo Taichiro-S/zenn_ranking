@@ -58,7 +58,7 @@ export function formatMessageForSlack(period, articles) {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `${title}\n` + `${article.body}`
+        text: `${title}\n` + '```' + `${article.body}` + '```'
       },
       accessory: {
         type: 'image',

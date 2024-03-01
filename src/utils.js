@@ -41,10 +41,10 @@ export function getTimePeriod(date, period) {
 
 export function extractBobyText(encodedStr) {
   // Unicodeエスケープされた文字列をデコードする
-  const res = encodedStr.replace(/\\u[\dA-F]{4}/gi, function (match) {
+  const decodedStr = encodedStr.replace(/\\u[\dA-F]{4}/gi, function (match) {
     return String.fromCharCode(parseInt(match.replace(/\\u/g, ''), 16))
   })
-  const textWithoutTags = res.replace(/<\/?[^>]+(>|$)/g, '')
+  const bodyText = decodedStr.replace(/<\/?[^>]+(>|$)/g, '').replace(/\n/g, '')
 
-  return textWithoutTags.substring(0, BODY_HTML_COUNT)
+  return bodyText.substring(0, BODY_HTML_COUNT) + '...'
 }
