@@ -58,8 +58,7 @@ export function formatMessageForSlack(period, articles) {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `${title}\n`
-        // + ` *著者:* ${author}\n *いいね数:* ${article.likedCount}\n *公開日:* ${publisheDate}\n *トピック:* ${topics}`
+        text: `${title}\n` + `${article.body}`
       },
       accessory: {
         type: 'image',
@@ -73,11 +72,11 @@ export function formatMessageForSlack(period, articles) {
       fields: [
         {
           type: 'mrkdwn',
-          text: `:pencil2: ${author}`
+          text: `*著者:*  ${author}`
         },
         {
           type: 'mrkdwn',
-          text: `:thumbsup: ${article.likedCount}`
+          text: `*いいね数:* ${article.likedCount}`
         }
       ]
     })
@@ -87,11 +86,11 @@ export function formatMessageForSlack(period, articles) {
       fields: [
         {
           type: 'mrkdwn',
-          text: `:spiral_calendar_pad: ${publisheDate}`
+          text: `*公開日:* ${publisheDate}`
         },
         {
           type: 'mrkdwn',
-          text: `:white_check_mark: ${topics}`
+          text: `*トピック:* ${topics}`
         }
       ]
     })

@@ -1,4 +1,4 @@
-import { TIME_PERIOD } from './constants'
+import { TIME_PERIOD, BODY_HTML_COUNT } from './constants'
 
 /**
  * Date型からHH:mm形式に変換
@@ -37,4 +37,14 @@ export function getTimePeriod(date, period) {
     start = new Date(date.getFullYear(), date.getMonth() - 1, 1, 0, 0, 0)
   }
   return { start, end }
+}
+
+export function extractBobyText(encodedStr) {
+  // Unicodeエスケープされた文字列をデコードする
+  const res = encodedStr.replace(/\\u[\dA-F]{4}/gi, function (match) {
+    return String.fromCharCode(parseInt(match.replace(/\\u/g, ''), 16))
+  })
+  const textWithoutTags = res.replace(/<\/?[^>]+(>|$)/g, '')
+
+  return textWithoutTags.substring(0, BODY_HTML_COUNT)
 }

@@ -6,6 +6,7 @@ import {
   ZENN_URL,
   TIME_PERIOD
 } from './constants'
+import { extractBobyText } from './utils'
 
 export function fetchAndSortZennArticles(period) {
   const today = new Date()
@@ -62,19 +63,22 @@ export function fetchAndSortZennArticles(period) {
   }
 
   const articleWithTopics = sortedArticles.map((article) => {
-    const topics = fetchTopics(article.slug)
-    article.topics = topics
+    const { topicNames, bodyText } = fetchArticleDetails(article.slug)
+    article.topics = topicNames
+    article.body = bodyText
     return article
   })
 
   return articleWithTopics
 }
 
-function fetchTopics(slug) {
+function fetchArticleDetails(slug) {
   const url = `${ZENN_ARTICLE_API_ENDPOINT}/${slug}`
   const response = UrlFetchApp.fetch(url)
   const data = JSON.parse(response.getContentText())
   const topics = data.article.topics || []
+  const bodyHtml = data.article.body_html || ''
   const topicNames = topics.map((topic) => topic.name)
-  return topicNames
+  const bodyText = extractBobyText(bodyHtml)
+  return { topicNames, bodyText }
 }
