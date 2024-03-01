@@ -1,7 +1,11 @@
 import { formatDate, escapeMarkdownSpecialChars, getTimePeriod } from './utils'
-
+import { FULL_RANKING_RESULT } from './constants'
 export function formatMessageForSlack(period, articles) {
-  const { start, end } = getTimePeriod(period)
+  const now = new Date()
+  const { start, end } = getTimePeriod(now, period)
+
+  const formattedStart = formatDate(start)
+  const formattedEnd = formatDate(end)
 
   const message = {
     blocks: [
@@ -10,7 +14,7 @@ export function formatMessageForSlack(period, articles) {
         elements: [
           {
             type: 'mrkdwn',
-            text: `${start} ~ ${end} のランキングです`
+            text: `${formattedStart} ~ ${formattedEnd} のランキングです`
           }
         ]
       }
@@ -19,14 +23,14 @@ export function formatMessageForSlack(period, articles) {
   let rank = 1
   const articlestest = articles.slice(0, 3)
   articlestest.forEach((article) => {
-    const title = `*<${article.url || ''}|${escapeMarkdownSpecialChars(article.title)}>*\n`
-    const author = `*<${article.userLink || ''}|${escapeMarkdownSpecialChars(article.username)}>*\n`
+    const title = `*<${article.url || ''}|${escapeMarkdownSpecialChars(article.title)}>*`
+    const author = `*<${article.userLink || ''}|${escapeMarkdownSpecialChars(article.username)}>*`
     const publisheDate = formatDate(new Date(article.publishedAt))
     let topics = ''
     for (const topic of article.topics) {
       topics += '`' + topic + '` '
     }
-    let emoji = ''
+    let emoji
     switch (rank) {
       case 1:
         emoji = ':first_place_medal:'
@@ -37,6 +41,8 @@ export function formatMessageForSlack(period, articles) {
       case 3:
         emoji = ':third_place_medal:'
         break
+      default:
+        emoji = ''
     }
     message.blocks.push({
       type: 'header',
@@ -47,24 +53,38 @@ export function formatMessageForSlack(period, articles) {
       }
     })
 
-    message.blocks.push({
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: title
+    message.blocks.push(
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `${title}\n *著者:* ${author}\n *いいね数:* ${article.likedCount}\n *公開日:* ${publisheDate}\n *トピック:* ${topics}`
+        },
+        accessory: {
+          type: 'image',
+          image_url: article.avatar,
+          alt_text: 'No Image'
+        }
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: title
+        }
       }
-    })
+    )
 
     message.blocks.push({
       type: 'section',
       fields: [
         {
           type: 'mrkdwn',
-          text: `*著者:* \n${author}`
+          text: `:pencil2: ${author}`
         },
         {
           type: 'mrkdwn',
-          text: `*いいね数:* \n${article.likedCount}`
+          text: `:thumbsup: ${article.likedCount}`
         }
       ]
     })
@@ -74,17 +94,25 @@ export function formatMessageForSlack(period, articles) {
       fields: [
         {
           type: 'mrkdwn',
-          text: `*公開日:* \n${publisheDate}`
+          text: `:spiral_calendar_pad: ${publisheDate}`
         },
         {
           type: 'mrkdwn',
-          text: `*トピック:* \n${topics}`
+          text: `:white_check_mark: ${topics}`
         }
       ]
     })
 
     message.blocks.push({
       type: 'divider'
+    })
+
+    message.blocks.push({
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `ランキングの続きは<こちら|${escapeMarkdownSpecialChars(FULL_RANKING_RESULT)}>から`
+      }
     })
 
     rank += 1

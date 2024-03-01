@@ -7,6 +7,12 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
+/**
+ * distにコピーするファイル
+ * version.js：アプリのバージョンをGASエディタ上で確認するためのファイル
+ * auth_success.html：slackのOAuth認証が成功した時に表示するHTMLファイル
+ * auth_fail.html：slackのOAuth認証が失敗した時に表示するHTMLファイル
+ */
 const filesToCopy = [
   { srcPath: 'src', destPath: 'dist', fileName: 'version.js' },
   { srcPath: 'src/html', destPath: 'dist', fileName: 'auth_success.html' },
@@ -28,7 +34,6 @@ esbuild
 
       fs.copyFile(srcPath, destPath, (err) => {
         if (err) throw err
-        console.log(`${file.fileName} was copied to dist directory.`)
       })
     })
   })

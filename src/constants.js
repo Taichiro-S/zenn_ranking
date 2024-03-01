@@ -21,3 +21,8 @@ export const DATA_TO_SHOW_IN_SPREADSHEET = [
 export const SLACK_OAUTH_SUCCESS_PAGE = 'auth_success'
 
 export const SLACK_OAUTH_FAIL_PAGE = 'auth_fail'
+
+export const GOOGLE_DATASTORE_API_ENDPOINT = 'https://datastore.googleapis.com/v1/projects'
+
+export const FULL_RANKING_RESULT =
+  'https://docs.google.com/spreadsheets/d/1dpL4yaTLMQ8zNOW0HtTWBSTpZ0zADgb6_Xgp8TT-Iuc/edit#gid=2124318226'

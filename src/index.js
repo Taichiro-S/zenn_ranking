@@ -1,5 +1,4 @@
 import {
-  ADMIN_EMAIL,
   SLACK_APP_CLIENT_ID,
   SLACK_APP_CLIENT_SECRET,
   REDIRECT_URL,
@@ -51,15 +50,15 @@ function doGet(e) {
         template.redirectUrl = redirectUrl
         return template.evaluate()
       } else {
-        console.log('エラーが発生しました1:', resJson)
+        console.error('Slack OAuth認証中にエラーが発生しました:', resJson)
         return HtmlService.createHtmlOutputFromFile(SLACK_OAUTH_FAIL_PAGE)
       }
     } catch (error) {
-      console.log('エラーが発生しました2:', error)
+      console.error('Slack OAuth認証中にエラーが発生しました:', error)
       return HtmlService.createHtmlOutputFromFile(SLACK_OAUTH_FAIL_PAGE)
     }
   } else {
-    console.log('codeがありません')
+    console.error('codeが取得できませんでした')
     return HtmlService.createHtmlOutputFromFile(SLACK_OAUTH_FAIL_PAGE)
   }
 }
@@ -81,9 +80,6 @@ function distributeMonthlyRanking() {
       formatErrorMessageForSlack(e, 'Zennの月間ランキング送信処理'),
       SLACK_WEBHOOK_URL_FOR_ERROR_LOG
     )
-    const subject = 'プロジェクト[Zennランキング]で、GASの実行中にエラーが発生しました。'
-    const message = 'エラーメッセージ\n' + e.message + '\n' + 'スタックトレース\n' + e.stack
-    MailApp.sendEmail(ADMIN_EMAIL, subject, message)
   }
 }
 
@@ -105,8 +101,5 @@ function distributeWeeklyRanking() {
       formatErrorMessageForSlack(e, 'Zennの週間ランキング送信処理'),
       SLACK_WEBHOOK_URL_FOR_ERROR_LOG
     )
-    const subject = 'プロジェクト[Zennランキング]で、GASの実行中にエラーが発生しました。'
-    const message = 'エラーメッセージ\n' + e.message + '\n' + 'スタックトレース\n' + e.stack
-    MailApp.sendEmail(ADMIN_EMAIL, subject, message)
   }
 }

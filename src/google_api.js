@@ -1,13 +1,16 @@
 import { fetchAndSortZennArticles } from './zenn_api'
 import { GCP_SERVICE_ACCOUNT_KEY, CLOUD_DATASTORE_TABLE_NAME } from './script_property'
 import { formatDate, getTimePeriod } from './utils'
-import { DATA_TO_SHOW_IN_SPREADSHEET } from './constants'
+import { DATA_TO_SHOW_IN_SPREADSHEET, TIME_PERIOD, GOOGLE_DATASTORE_API_ENDPOINT } from './constants'
 
 function saveArticlesToSpreadsheet(period) {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
-  const { start, end } = getTimePeriod(period)
-  const title = period === 'weekly' ? '週間' : '月間'
-  const sheetName = `${title}ランキング(${start} ~ ${end})`
+  const now = new Date()
+  const { start, end } = getTimePeriod(now, period)
+  const formattedStart = formatDate(start)
+  const formattedEnd = formatDate(end)
+  const title = period === TIME_PERIOD.WEEKLY ? '週間' : '月間'
+  const sheetName = `${title}ランキング(${formattedStart} ~ ${formattedEnd})`
   let sheet = spreadsheet.getSheetByName(sheetName)
   if (!sheet) {
     sheet = spreadsheet.insertSheet(sheetName)
@@ -36,19 +39,17 @@ function saveArticlesToSpreadsheet(period) {
 }
 
 export function saveWeeklyArticlesToSpreadsheet() {
-  saveArticlesToSpreadsheet('weekly')
+  saveArticlesToSpreadsheet(TIME_PERIOD.WEEKLY)
 }
 
 export function saveMonthlyArticlesToSpreadsheet() {
-  saveArticlesToSpreadsheet('monthly')
+  saveArticlesToSpreadsheet(TIME_PERIOD.MONTHLY)
 }
 
 export function saveOAuthInfo(resJson) {
   const token = ScriptApp.getOAuthToken()
   const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
-  const url = `https://datastore.googleapis.com/v1/projects/${projectId}:commit`
-  console.log('token:', token)
-  console.log('url:', url)
+  const url = `${GOOGLE_DATASTORE_API_ENDPOINT}/${projectId}:commit`
   const payload = {
     mode: 'NON_TRANSACTIONAL',
     mutations: [
@@ -95,7 +96,7 @@ export function saveOAuthInfo(resJson) {
 export function fetchSlackWebhookUrls() {
   const token = ScriptApp.getOAuthToken()
   const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
-  const url = `https://datastore.googleapis.com/v1/projects/${projectId}:runQuery`
+  const url = `${GOOGLE_DATASTORE_API_ENDPOINT}/${projectId}:runQuery`
   const payload = {
     query: {
       kind: [
@@ -122,13 +123,8 @@ export function fetchSlackWebhookUrls() {
     payload: JSON.stringify(payload),
     muteHttpExceptions: true
   }
-  let jsonResponse
-  try {
-    const response = UrlFetchApp.fetch(url, options)
-    jsonResponse = JSON.parse(response.getContentText())
-  } catch (error) {
-    console.error('エラーが発生しました:', error)
-  }
+  const response = UrlFetchApp.fetch(url, options)
+  const jsonResponse = JSON.parse(response.getContentText())
   const webhookUrls = jsonResponse.batch.entityResults.map((result) => result.entity.properties.webhook_url.stringValue)
   return webhookUrls
 }

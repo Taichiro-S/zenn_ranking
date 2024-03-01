@@ -40,6 +40,7 @@ export const CLOUD_DATASTORE_TABLE_NAME = scriptProperties.getProperty('CLOUD_DA
 
 /**
  * slackのOAuth認証のリダイレクトURL
+ * テスト用と本番用でデプロイしたそれぞれのアプリのURLにする
  * @type {string}
  */
 export const REDIRECT_URL = scriptProperties.getProperty('REDIRECT_URL')

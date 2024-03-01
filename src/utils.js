@@ -8,12 +8,10 @@ import { TIME_PERIOD } from './constants'
 export function formatTime(date) {
   let hours = date.getHours()
   let minutes = date.getMinutes()
-
   // 時間が1桁の場合は先頭に0を追加
   hours = hours < 10 ? '0' + hours : hours
   // 分が1桁の場合は先頭に0を追加
   minutes = minutes < 10 ? '0' + minutes : minutes
-
   return hours + ':' + minutes
 }
 
@@ -23,20 +21,20 @@ export function escapeMarkdownSpecialChars(text) {
 
 export function formatDate(date) {
   const res = Utilities.formatDate(date, Session.getScriptTimeZone(), 'MM/dd')
-  if (res.startsWith(0)) {
-    return res.slice(1, res.length)
-  }
-  return res
+  // 月日が01-09の場合、先頭の0を取り除く
+  return res.replace(/^0/, '').replace(/\/0/, '/')
 }
 
-export function getTimePeriod(period) {
-  const today = new Date()
-  let start
-  const end = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1)
+export function getTimePeriod(date, period) {
+  let start, end
   if (period === TIME_PERIOD.WEEKLY) {
-    start = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 8)
+    // 前日の時刻00:00:00と8日前の00:00:00を返す
+    end = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1, 0, 0, 0)
+    start = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 8, 0, 0, 0)
   } else if (period === TIME_PERIOD.MONTHLY) {
-    start = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+    // 先月の1日の時刻00:00:00と当月の1日の時刻00:00:00を返す
+    end = new Date(date.getFullYear(), date.getMonth(), 1, 0, 0, 0)
+    start = new Date(date.getFullYear(), date.getMonth() - 1, 1, 0, 0, 0)
   }
-  return { start: formatDate(start), end: formatDate(end) }
+  return { start, end }
 }

@@ -6,9 +6,20 @@
     <title>認証成功</title>
   </head>
   <body>
-    <h1>認証に成功しました 😊</h1>
-    <p>以下からSlackアプリを開いてください</p>
-    <button onclick="openSlackApp()">Slackアプリを開く</button>
+    <h1>認証に成功しました</h1>
+    <p>アプリがワークスペースにインストールされました！🎉</p>
+    <button onclick="openSlackApp()">
+      <img
+        alt="Slackを開く"
+        height="40"
+        width="139"
+        src="https://platform.slack-edge.com/img/add_to_slack.png"
+        srcset="
+          https://platform.slack-edge.com/img/add_to_slack.png    1x,
+          https://platform.slack-edge.com/img/add_to_slack@2x.png 2x
+        "
+      />
+    </button>
     <script>
       function openSlackApp() {
         var url = '<?= redirectUrl ?>'
