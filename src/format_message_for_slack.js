@@ -22,6 +22,7 @@ export function formatMessageForSlack(period, articles) {
   }
   let rank = 1
   const articlestest = articles.slice(0, 3)
+  const linkForFullRanking = `<${escapeMarkdownSpecialChars(FULL_RANKING_RESULT)}|こちら>`
   articlestest.forEach((article) => {
     const title = `*<${article.url || ''}|${escapeMarkdownSpecialChars(article.title)}>*`
     const author = `*<${article.userLink || ''}|${escapeMarkdownSpecialChars(article.username)}>*`
@@ -53,27 +54,19 @@ export function formatMessageForSlack(period, articles) {
       }
     })
 
-    message.blocks.push(
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: `${title}\n *著者:* ${author}\n *いいね数:* ${article.likedCount}\n *公開日:* ${publisheDate}\n *トピック:* ${topics}`
-        },
-        accessory: {
-          type: 'image',
-          image_url: article.avatar,
-          alt_text: 'No Image'
-        }
+    message.blocks.push({
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `${title}\n`
+        // + ` *著者:* ${author}\n *いいね数:* ${article.likedCount}\n *公開日:* ${publisheDate}\n *トピック:* ${topics}`
       },
-      {
-        type: 'section',
-        text: {
-          type: 'mrkdwn',
-          text: title
-        }
+      accessory: {
+        type: 'image',
+        image_url: article.avatar,
+        alt_text: 'No Image'
       }
-    )
+    })
 
     message.blocks.push({
       type: 'section',
@@ -107,15 +100,15 @@ export function formatMessageForSlack(period, articles) {
       type: 'divider'
     })
 
-    message.blocks.push({
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `ランキングの続きは<こちら|${escapeMarkdownSpecialChars(FULL_RANKING_RESULT)}>から`
-      }
-    })
-
     rank += 1
+  })
+
+  message.blocks.push({
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text: `ランキングの続きは${linkForFullRanking}から`
+    }
   })
 
   return message
