@@ -16,7 +16,10 @@ const __dirname = dirname(__filename)
 const filesToCopy = [
   { srcPath: 'src', destPath: 'dist', fileName: 'version.js' },
   { srcPath: 'src/html', destPath: 'dist', fileName: 'auth_success.html' },
-  { srcPath: 'src/html', destPath: 'dist', fileName: 'auth_fail.html' }
+  { srcPath: 'src/html', destPath: 'dist', fileName: 'auth_fail.html' },
+  { srcPath: 'src/html', destPath: 'dist', fileName: 'monthly_ranking.html' },
+  { srcPath: 'src/html', destPath: 'dist', fileName: 'weekthly_ranking.html' },
+  { srcPath: 'src/html', destPath: 'dist', fileName: 'not_found.html' }
 ]
 
 esbuild
