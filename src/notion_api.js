@@ -1,5 +1,5 @@
-import { DEFAULT_EMOJI } from './constants'
-import { NOTION_API_KEY, NOTION_DATABASE_PARENT_ID } from './script_property'
+import { DEFAULT_EMOJI, TIME_PERIOD } from './constants'
+import { NOTION_API_KEY, NOTION_MONTHLY_DATABASE_PARENT_ID, NOTION_WEEKLY_DATABASE_PARENT_ID } from './script_property'
 import { formatDate, getTimePeriod } from './utils'
 
 function createDatabase(period) {
@@ -7,11 +7,11 @@ function createDatabase(period) {
   const { start, end } = getTimePeriod(savedAt, period)
   const formattedStart = formatDate(start)
   const formattedEnd = formatDate(end)
-
+  const pageId = period === TIME_PERIOD.WEEKLY ? NOTION_WEEKLY_DATABASE_PARENT_ID : NOTION_MONTHLY_DATABASE_PARENT_ID
   const url = 'https://api.notion.com/v1/databases'
   const databaseName = `${formattedStart} ~ ${formattedEnd}のランキング`
   const payload = {
-    parent: { page_id: NOTION_DATABASE_PARENT_ID },
+    parent: { page_id: pageId },
     title: [
       {
         type: 'text',

@@ -53,5 +53,6 @@ export const CLOUD_DATASTORE_TABLE_FOR_ARTICLES = scriptProperties.getProperty('
 export const REDIRECT_URL = scriptProperties.getProperty('REDIRECT_URL')
 
 export const NOTION_API_KEY = scriptProperties.getProperty('NOTION_API_KEY')
-export const NOTION_DATABASE_PARENT_ID = scriptProperties.getProperty('NOTION_DATABASE_PARENT_ID')
+export const NOTION_MONTHLY_DATABASE_PARENT_ID = scriptProperties.getProperty('NOTION_MONTHLY_DATABASE_PARENT_ID')
+export const NOTION_WEEKLY_DATABASE_PARENT_ID = scriptProperties.getProperty('NOTION_WEEKLY_DATABASE_PARENT_ID')
 export const NOTION_PUB_URL = scriptProperties.getProperty('NOTION_PUB_URL')
