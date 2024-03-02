@@ -214,8 +214,7 @@ export function fetchArticleRanking(period) {
             }
           ]
         }
-      },
-      order: [{ property: { name: 'likedCount' }, direction: 'DESCENDING' }]
+      }
     }
   }
 
@@ -248,8 +247,8 @@ export function fetchArticleRanking(period) {
         savedAt: article.savedAt.stringValue
       }
     })
-
-    return articles
+    const sortedArticles = articles.sort((a, b) => b.likedCount - a.likedCount)
+    return sortedArticles
   } else {
     console.log('No articles found for the specified period.')
     return []
