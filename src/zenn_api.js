@@ -6,15 +6,12 @@ import {
   ZENN_URL,
   TIME_PERIOD
 } from './constants'
-import { extractBobyText } from './utils'
+import { extractBobyText, getTimePeriod } from './utils'
 
 export function fetchAndSortZennArticles(period) {
-  const today = new Date()
-  const start =
-    period === TIME_PERIOD.WEEKLY
-      ? new Date(today.getFullYear(), today.getMonth(), today.getDate() - 8)
-      : new Date(today.getFullYear(), today.getMonth() - 1, 1)
-  const cutoff = TIME_PERIOD.WEEKLY ? WEEKLY_RANKING_COUNT : MONTHLY_RANKING_COUNT
+  const now = new Date()
+  const { start, end } = getTimePeriod(now, period)
+  const cutoff = period === TIME_PERIOD.WEEKLY ? WEEKLY_RANKING_COUNT : MONTHLY_RANKING_COUNT
 
   let keepFetching = true
   let nextPage = 1
@@ -28,7 +25,7 @@ export function fetchAndSortZennArticles(period) {
 
     for (const article of articles) {
       const publishedAt = new Date(article.published_at)
-      if (publishedAt >= start) {
+      if (publishedAt >= start && publishedAt <= end) {
         allArticles.push(article)
       } else {
         keepFetching = false

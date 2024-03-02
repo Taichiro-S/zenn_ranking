@@ -50,6 +50,6 @@ export function extractBobyText(encodedStr) {
 }
 
 export function pageExists(pageName) {
-  const pages = [MONTHLY_RANKING_PAGE, WEEKLY_RANKING_PAGE] // 存在するページのリスト
+  const pages = [MONTHLY_RANKING_PAGE, WEEKLY_RANKING_PAGE]
   return pages.includes(pageName)
 }

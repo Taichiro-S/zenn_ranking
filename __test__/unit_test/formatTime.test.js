@@ -1,4 +1,4 @@
-import { formatTime } from '../src/utils'
+import { formatTime } from '../../src/utils'
 
 describe('formatTimeのテスト', () => {
   test('時間と分が両方２桁の場合', () => {

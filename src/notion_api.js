@@ -1,4 +1,4 @@
-import { DEFAULT_EMOJI, MONTHLY_RANKING_COUNT, TIME_PERIOD, WEEKLY_RANKING_COUNT } from './constants'
+import { DEFAULT_EMOJI, TIME_PERIOD } from './constants'
 import { NOTION_API_KEY, NOTION_DATABASE_PARENT_ID } from './script_property'
 
 const createDatabase = async (period) => {
@@ -19,7 +19,6 @@ const createDatabase = async (period) => {
       }
     ],
     properties: {
-      順位: { number: { format: 'number' } },
       ユーザー: { files: {} },
       記事タイトル: { title: {} },
       いいね数: { number: { format: 'number' } },
@@ -43,17 +42,16 @@ const createDatabase = async (period) => {
   }
 
   const response = UrlFetchApp.fetch(url, options)
-  return response.getContentText()
+  return JSON.parse(response.getContentText())
 }
 
-const insertDataIntoDatabase = async (databaseId, article, rank) => {
+const insertDataIntoDatabase = async (databaseId, article) => {
   const now = new Date()
   const url = 'https://api.notion.com/v1/pages'
   const payload = {
     parent: { type: 'database_id', database_id: databaseId },
     icon: { type: 'emoji', emoji: article.emoji },
     properties: {
-      順位: { number: rank },
       ユーザー: {
         files: [{ name: `${article.username}_avatar`, type: 'external', external: { url: article.avatar } }]
       },
@@ -93,18 +91,17 @@ export const saveArticlesToNotion = async (articles, period) => {
   const sortedArticles = articles.sort((a, b) => a.likedCount - b.likedCount)
   const dbResponse = await createDatabase(period)
   const databaseId = dbResponse.id
-  let rank = period === TIME_PERIOD.WEEKLY ? WEEKLY_RANKING_COUNT : MONTHLY_RANKING_COUNT
   for (const article of sortedArticles) {
     try {
-      await insertDataIntoDatabase(databaseId, article, rank)
+      await insertDataIntoDatabase(databaseId, article)
     } catch (e) {
       if (e.response && e.response.data && e.response.data.message.includes('emoji')) {
         article.emoji = DEFAULT_EMOJI
-        await insertDataIntoDatabase(databaseId, article, rank)
+        await insertDataIntoDatabase(databaseId, article)
       } else {
         throw e
       }
     }
-    rank -= 1
   }
+  return databaseId.replaceAll('-', '')
 }

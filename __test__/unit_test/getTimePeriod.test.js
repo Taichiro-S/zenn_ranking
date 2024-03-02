@@ -1,5 +1,5 @@
-import { getTimePeriod } from '../src/utils'
-import { TIME_PERIOD } from '../src/constants'
+import { getTimePeriod } from '../../src/utils'
+import { TIME_PERIOD } from '../../src/constants'
 
 describe('getTimePeriod', () => {
   it('1週間の開始と終了を返す', () => {

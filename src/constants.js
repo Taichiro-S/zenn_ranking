@@ -34,3 +34,6 @@ export const FULL_RANKING_RESULT =
   'https://docs.google.com/spreadsheets/d/1dpL4yaTLMQ8zNOW0HtTWBSTpZ0zADgb6_Xgp8TT-Iuc/edit#gid=2124318226'
 export const BODY_HTML_COUNT = 100
 export const DEFAULT_EMOJI = '📕'
+
+export const SLACK_OATUH_API_ENDPOINT = 'https://slack.com/api/oauth.v2.access'
+export const SLACK_OAUTH_REDIRECT_URL = 'https://slack.com/app_redirect'

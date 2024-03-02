@@ -1,4 +1,4 @@
-import { formatDate } from '../src/utils'
+import { formatDate } from '../../src/utils'
 
 const mockFormatDate = jest.fn()
 const mockGetScriptTimeZone = jest.fn()

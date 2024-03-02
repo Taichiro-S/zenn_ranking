@@ -1,6 +1,7 @@
 import { formatDate, escapeMarkdownSpecialChars, getTimePeriod } from './utils'
-import { FULL_RANKING_RESULT } from './constants'
-export function formatMessageForSlack(period, articles) {
+import { NOTION_PUB_URL } from './script_property'
+
+export function formatMessageForSlack(articles, period, databasePath) {
   const now = new Date()
   const { start, end } = getTimePeriod(now, period)
 
@@ -22,7 +23,8 @@ export function formatMessageForSlack(period, articles) {
   }
   let rank = 1
   const articlestest = articles.slice(0, 3)
-  const linkForFullRanking = `<${escapeMarkdownSpecialChars(FULL_RANKING_RESULT)}|こちら>`
+  const fullPath = NOTION_PUB_URL + databasePath
+  const linkForFullRanking = `<${escapeMarkdownSpecialChars(fullPath)}|こちら>`
   articlestest.forEach((article) => {
     const title = `*<${article.url || ''}|${escapeMarkdownSpecialChars(article.title)}>*`
     const author = `*<${article.userLink || ''}|${escapeMarkdownSpecialChars(article.username)}>*`
