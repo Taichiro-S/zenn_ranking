@@ -26,7 +26,6 @@ global.doGet = doGet
 function doGet(e) {
   const code = e.parameter.code
   const page = e.parameter.page
-  console.log(code, page)
   if (code) {
     try {
       const res = UrlFetchApp.fetch('https://slack.com/api/oauth.v2.access', {
@@ -49,11 +48,9 @@ function doGet(e) {
         template.redirectUrl = redirectUrl
         return template.evaluate()
       } else {
-        console.error('Slack OAuth認証に失敗しました:', resJson)
         return HtmlService.createHtmlOutputFromFile(PAGES.SLACK_OAUTH_FAIL)
       }
     } catch (error) {
-      console.error('Slack OAuth認証中にエラーが発生しました:', error)
       return HtmlService.createHtmlOutputFromFile(PAGES.SLACK_OAUTH_FAIL)
     }
   } else if (pageExists(page)) {

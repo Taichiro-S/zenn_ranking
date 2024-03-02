@@ -249,8 +249,6 @@ export function fetchArticleRanking(period) {
     })
     const sortedArticles = articles.sort((a, b) => b.likedCount - a.likedCount)
     return sortedArticles
-  } else {
-    console.log('No articles found for the specified period.')
-    return []
   }
+  return []
 }

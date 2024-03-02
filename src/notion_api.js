@@ -43,12 +43,7 @@ const createDatabase = async (period) => {
   }
 
   const response = UrlFetchApp.fetch(url, options)
-  const statusCode = response.getResponseCode()
-  const content = response.getContentText()
-
-  console.log(statusCode, content)
-
-  return response.data
+  return response.getContentText()
 }
 
 const insertDataIntoDatabase = async (databaseId, article, rank) => {
@@ -58,7 +53,7 @@ const insertDataIntoDatabase = async (databaseId, article, rank) => {
     parent: { type: 'database_id', database_id: databaseId },
     icon: { type: 'emoji', emoji: article.emoji },
     properties: {
-      順位: { number: 1 }, // 例: 順位を1として設定
+      順位: { number: rank },
       ユーザー: {
         files: [{ name: `${article.username}_avatar`, type: 'external', external: { url: article.avatar } }]
       },
@@ -82,7 +77,7 @@ const insertDataIntoDatabase = async (databaseId, article, rank) => {
       'Notion-Version': '2022-06-28'
     },
     payload: JSON.stringify(payload),
-    muteHttpExceptions: true // HTTP例外をミュートに設定
+    muteHttpExceptions: true
   }
 
   const response = UrlFetchApp.fetch(url, options)
@@ -90,39 +85,26 @@ const insertDataIntoDatabase = async (databaseId, article, rank) => {
   const responseBody = response.getContentText()
 
   if (responseCode !== 200) {
-    throw new Error(`Failed to create page: ${responseBody}`)
-  } else {
-    Logger.log(`Article '${article.title}' inserted successfully.`)
+    throw new Error(`Failed to insert article: ${responseBody}`)
   }
-
-  //   if (response.status !== 200) {
-  //     throw new Error(`Failed to create page: ${response.statusText}`)
-  //   }
 }
 
 export const saveArticlesToNotion = async (articles, period) => {
-  try {
-    const sortedArticles = articles.sort((a, b) => a.likedCount - b.likedCount)
-    const dbResponse = await createDatabase()
-    const databaseId = dbResponse.id
-    let rank = period === TIME_PERIOD.WEEKLY ? WEEKLY_RANKING_COUNT : MONTHLY_RANKING_COUNT
-    for (const article of sortedArticles) {
-      try {
+  const sortedArticles = articles.sort((a, b) => a.likedCount - b.likedCount)
+  const dbResponse = await createDatabase(period)
+  const databaseId = dbResponse.id
+  let rank = period === TIME_PERIOD.WEEKLY ? WEEKLY_RANKING_COUNT : MONTHLY_RANKING_COUNT
+  for (const article of sortedArticles) {
+    try {
+      await insertDataIntoDatabase(databaseId, article, rank)
+    } catch (e) {
+      if (e.response && e.response.data && e.response.data.message.includes('emoji')) {
+        article.emoji = DEFAULT_EMOJI
         await insertDataIntoDatabase(databaseId, article, rank)
-      } catch (e) {
-        if (e.response && e.response.data && e.response.data.message.includes('emoji')) {
-          console.log(e.response.data)
-          console.log('Emoji not supported, retrying with default emoji...')
-          article.emoji = DEFAULT_EMOJI
-          await insertDataIntoDatabase(databaseId, article, rank)
-        } else {
-          throw e
-        }
+      } else {
+        throw e
       }
-      rank -= 1
     }
-    console.log('データベースへの挿入が完了しました。')
-  } catch (e) {
-    console.error(e.response.data)
+    rank -= 1
   }
 }
