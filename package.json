@@ -17,7 +17,6 @@
   "devDependencies": {
     "@babel/core": "^7.23.9",
     "@babel/preset-env": "^7.23.9",
-    "axios": "^1.6.7",
     "babel-jest": "^29.7.0",
     "esbuild": "^0.20.1",
     "esbuild-gas-plugin": "^0.8.0",
