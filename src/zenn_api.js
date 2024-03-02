@@ -18,14 +18,17 @@ export function fetchAndSortZennArticles(period) {
   const allArticles = []
 
   while (keepFetching) {
-    const url = `${ZENN_ARTICLE_API_ENDPOINT}?order=latest&min_liked_count=${MIN_LIKED_COUNT}&page=${nextPage}`
+    const url = `${ZENN_ARTICLE_API_ENDPOINT}?order=latest&count=100&min_liked_count=${MIN_LIKED_COUNT}&page=${nextPage}`
     const response = UrlFetchApp.fetch(url)
     const data = JSON.parse(response.getContentText())
     const articles = data.articles || []
 
     for (const article of articles) {
       const publishedAt = new Date(article.published_at)
-      if (publishedAt >= start && publishedAt <= end) {
+      if (publishedAt >= end) {
+        continue
+      }
+      if (publishedAt >= start) {
         allArticles.push(article)
       } else {
         keepFetching = false

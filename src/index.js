@@ -64,7 +64,7 @@ function distributeMonthlyRanking() {
     const webhookUrls = fetchSlackWebhookUrls()
     const articles = fetchAndSortZennArticles(TIME_PERIOD.MONTHLY)
     const databasePath = saveArticlesToNotion(articles, TIME_PERIOD.MONTHLY)
-    const message = formatMessageForSlack(articles, TIME_PERIOD.WEEKLY, databasePath)
+    const message = formatMessageForSlack(articles, TIME_PERIOD.MONTHLY, databasePath)
     webhookUrls.forEach((webhookUrl) => {
       sendMessageToSlackChannel(message, webhookUrl)
     })

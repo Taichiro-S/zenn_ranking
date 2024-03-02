@@ -1,15 +1,15 @@
-import { DEFAULT_EMOJI, TIME_PERIOD } from './constants'
+import { DEFAULT_EMOJI } from './constants'
 import { NOTION_API_KEY, NOTION_DATABASE_PARENT_ID } from './script_property'
+import { formatDate, getTimePeriod } from './utils'
 
-const createDatabase = async (period) => {
-  const savedAt = new Date().toISOString().split('T')[0]
+function createDatabase(period) {
+  const savedAt = new Date()
+  const { start, end } = getTimePeriod(savedAt, period)
+  const formattedStart = formatDate(start)
+  const formattedEnd = formatDate(end)
+
   const url = 'https://api.notion.com/v1/databases'
-  let databaseName
-  if (period === TIME_PERIOD.WEEKLY) {
-    databaseName = `週間ランキング_${savedAt}`
-  } else if (period === TIME_PERIOD.MONTHLY) {
-    databaseName = `月間ランキング_${savedAt}`
-  }
+  const databaseName = `${formattedStart} ~ ${formattedEnd}のランキング`
   const payload = {
     parent: { page_id: NOTION_DATABASE_PARENT_ID },
     title: [
@@ -45,7 +45,7 @@ const createDatabase = async (period) => {
   return JSON.parse(response.getContentText())
 }
 
-const insertDataIntoDatabase = async (databaseId, article) => {
+function insertDataIntoDatabase(databaseId, article) {
   const now = new Date()
   const url = 'https://api.notion.com/v1/pages'
   const payload = {
@@ -87,17 +87,17 @@ const insertDataIntoDatabase = async (databaseId, article) => {
   }
 }
 
-export const saveArticlesToNotion = async (articles, period) => {
-  const sortedArticles = articles.sort((a, b) => a.likedCount - b.likedCount)
-  const dbResponse = await createDatabase(period)
+export function saveArticlesToNotion(articles, period) {
+  const sortedArticles = articles.conncat().sort((a, b) => a.likedCount - b.likedCount)
+  const dbResponse = createDatabase(period)
   const databaseId = dbResponse.id
   for (const article of sortedArticles) {
     try {
-      await insertDataIntoDatabase(databaseId, article)
+      insertDataIntoDatabase(databaseId, article)
     } catch (e) {
       if (e.response && e.response.data && e.response.data.message.includes('emoji')) {
         article.emoji = DEFAULT_EMOJI
-        await insertDataIntoDatabase(databaseId, article)
+        insertDataIntoDatabase(databaseId, article)
       } else {
         throw e
       }
