@@ -10,6 +10,7 @@ import { fetchSlackWebhookUrls, saveOAuthInfo, saveArticleRanking, fetchArticleR
 import { TIME_PERIOD, PAGES } from './constants'
 import { fetchAndSortZennArticles } from './zenn_api'
 import { pageExists } from './utils'
+import { saveArticlesToNotion } from './notion_api'
 
 // GASから関数を呼び出すために、グローバル変数に登録する
 global.distributeMonthlyRanking = distributeMonthlyRanking
@@ -82,6 +83,7 @@ function distributeMonthlyRanking() {
     webhookUrls.forEach((webhookUrl) => {
       sendMessageToSlackChannel(message, webhookUrl)
     })
+    saveArticlesToNotion(articles, TIME_PERIOD.MONTHLY)
     saveArticleRanking(articles, TIME_PERIOD.MONTHLY)
   } catch (e) {
     sendMessageToSlackChannel(
@@ -103,6 +105,7 @@ function distributeWeeklyRanking() {
     webhookUrls.forEach((webhookUrl) => {
       sendMessageToSlackChannel(message, webhookUrl)
     })
+    saveArticlesToNotion(articles, TIME_PERIOD.WEEKLY)
     saveArticleRanking(articles, TIME_PERIOD.WEEKLY)
   } catch (e) {
     sendMessageToSlackChannel(

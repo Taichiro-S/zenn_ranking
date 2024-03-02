@@ -33,3 +33,4 @@ export const GOOGLE_DATASTORE_API_ENDPOINT = 'https://datastore.googleapis.com/v
 export const FULL_RANKING_RESULT =
   'https://docs.google.com/spreadsheets/d/1dpL4yaTLMQ8zNOW0HtTWBSTpZ0zADgb6_Xgp8TT-Iuc/edit#gid=2124318226'
 export const BODY_HTML_COUNT = 100
+export const DEFAULT_EMOJI = '📕'
