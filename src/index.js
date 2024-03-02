@@ -6,9 +6,10 @@ import {
 } from './script_property'
 import { formatErrorMessageForSlack, formatMessageForSlack } from './format_message_for_slack'
 import { sendMessageToSlackChannel } from './slack_api'
-import { fetchSlackWebhookUrls, saveOAuthInfo, saveArticleRanking } from './google_api'
-import { SLACK_OAUTH_SUCCESS_PAGE, SLACK_OAUTH_FAIL_PAGE, TIME_PERIOD } from './constants'
+import { fetchSlackWebhookUrls, saveOAuthInfo, saveArticleRanking, fetchArticleRanking } from './google_api'
+import { TIME_PERIOD, PAGES } from './constants'
 import { fetchAndSortZennArticles } from './zenn_api'
+import { pageExists } from './utils'
 
 // GASから関数を呼び出すために、グローバル変数に登録する
 global.distributeMonthlyRanking = distributeMonthlyRanking
@@ -23,6 +24,8 @@ global.doGet = doGet
  */
 function doGet(e) {
   const code = e.parameter.code
+  const page = e.parameter.page
+  console.log(code, page)
   if (code) {
     try {
       const res = UrlFetchApp.fetch('https://slack.com/api/oauth.v2.access', {
@@ -41,20 +44,30 @@ function doGet(e) {
         const teamId = resJson.team.id
         const appId = resJson.app_id
         const redirectUrl = `https://slack.com/app_redirect?team=${teamId}&app=${appId}`
-        const template = HtmlService.createTemplateFromFile(SLACK_OAUTH_SUCCESS_PAGE)
+        const template = HtmlService.createTemplateFromFile(PAGES.SLACK_OAUTH_SUCCESS)
         template.redirectUrl = redirectUrl
         return template.evaluate()
       } else {
-        console.error('Slack OAuth認証中にエラーが発生しました:', resJson)
-        return HtmlService.createHtmlOutputFromFile(SLACK_OAUTH_FAIL_PAGE)
+        console.error('Slack OAuth認証に失敗しました:', resJson)
+        return HtmlService.createHtmlOutputFromFile(PAGES.SLACK_OAUTH_FAIL)
       }
     } catch (error) {
       console.error('Slack OAuth認証中にエラーが発生しました:', error)
-      return HtmlService.createHtmlOutputFromFile(SLACK_OAUTH_FAIL_PAGE)
+      return HtmlService.createHtmlOutputFromFile(PAGES.SLACK_OAUTH_FAIL)
     }
+  } else if (pageExists(page)) {
+    let period
+    if (page === PAGES.MONTHLY_RANKING) {
+      period = TIME_PERIOD.MONTHLY
+    } else if (page === PAGES.WEEKLY_RANKING) {
+      period = TIME_PERIOD.WEEKLY
+    }
+    const articles = fetchArticleRanking(period)
+    const template = HtmlService.createTemplateFromFile(page)
+    template.articles = articles
+    return template.evaluate()
   } else {
-    console.error('codeが取得できませんでした')
-    return HtmlService.createHtmlOutputFromFile(SLACK_OAUTH_FAIL_PAGE)
+    return HtmlService.createHtmlOutputFromFile(PAGES.NOT_FOUND)
   }
 }
 

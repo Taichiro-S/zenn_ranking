@@ -1,4 +1,4 @@
-import { TIME_PERIOD, BODY_HTML_COUNT } from './constants'
+import { TIME_PERIOD, BODY_HTML_COUNT, WEEKLY_RANKING_PAGE, MONTHLY_RANKING_PAGE } from './constants'
 
 /**
  * Date型からHH:mm形式に変換
@@ -47,4 +47,9 @@ export function extractBobyText(encodedStr) {
   const bodyText = decodedStr.replace(/<\/?[^>]+(>|$)/g, '').replace(/\n/g, '')
 
   return bodyText.substring(0, BODY_HTML_COUNT) + '...'
+}
+
+export function pageExists(pageName) {
+  const pages = [MONTHLY_RANKING_PAGE, WEEKLY_RANKING_PAGE] // 存在するページのリスト
+  return pages.includes(pageName)
 }
