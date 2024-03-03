@@ -6,7 +6,7 @@ import {
 } from './script_property'
 import { formatErrorMessageForSlack, formatMessageForSlack } from './format_message_for_slack'
 import { sendMessageToSlackChannel } from './slack_api'
-import { fetchSlackWebhookUrls, saveOAuthInfo } from './google_api'
+import { fetchSlackWebhookUrls, saveOAuthInfoToDatastore } from './google_api'
 import { TIME_PERIOD, PAGES, SLACK_OATUH_API_ENDPOINT, SLACK_OAUTH_REDIRECT_URL } from './constants'
 import { fetchAndSortZennArticles } from './zenn_api'
 import { saveArticlesToNotion } from './notion_api'
@@ -17,7 +17,7 @@ global.distributeWeeklyRanking = distributeWeeklyRanking
 global.doGet = doGet
 
 /**
- * slackのOAuth認証を行うためのリダイレクトで実行
+ * slackのOAuth認証のリダイレクト時に実行
  * トークン情報を取得してCloud Datastoreに保存する
  * @param {*} e
  * @returns
@@ -38,7 +38,7 @@ function doGet(e) {
 
       const resJson = JSON.parse(res.getContentText())
       if (resJson.ok) {
-        saveOAuthInfo(resJson)
+        saveOAuthInfoToDatastore(resJson)
         const teamId = resJson.team.id
         const appId = resJson.app_id
         const redirectUrl = `${SLACK_OAUTH_REDIRECT_URL}?team=${teamId}&app=${appId}`

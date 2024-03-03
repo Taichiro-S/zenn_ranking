@@ -28,13 +28,13 @@ export function formatDate(date) {
 export function getTimePeriod(date, period) {
   let start, end
   if (period === TIME_PERIOD.WEEKLY) {
-    // 前日の時刻00:00:00と8日前の00:00:00を返す
-    end = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1, 0, 0, 0)
-    start = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 8, 0, 0, 0)
+    // 7日前の00:00:00と前日の時刻23:59:59を返す
+    start = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 7, 0, 0, 0)
+    end = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1, 23, 59, 59)
   } else if (period === TIME_PERIOD.MONTHLY) {
-    // 先月の1日の時刻00:00:00と当月の1日の時刻00:00:00を返す
-    end = new Date(date.getFullYear(), date.getMonth(), 1, 0, 0, 0)
+    // 先月の1日の時刻00:00:00と先月の末日の時刻23:59:59を返す
     start = new Date(date.getFullYear(), date.getMonth() - 1, 1, 0, 0, 0)
+    end = new Date(date.getFullYear(), date.getMonth(), 0, 23, 59, 59)
   }
   return { start, end }
 }

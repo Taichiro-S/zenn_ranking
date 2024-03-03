@@ -38,7 +38,7 @@ function createDatabase(period) {
       'Notion-Version': '2022-06-28'
     },
     payload: JSON.stringify(payload),
-    muteHttpExceptions: true // これにより、例外がスローされずにエラー応答を処理できます
+    muteHttpExceptions: true
   }
 
   const response = UrlFetchApp.fetch(url, options)
@@ -88,7 +88,7 @@ function insertDataIntoDatabase(databaseId, article) {
 }
 
 export function saveArticlesToNotion(articles, period) {
-  const sortedArticles = articles.conncat().sort((a, b) => a.likedCount - b.likedCount)
+  const sortedArticles = articles.concat().sort((a, b) => a.likedCount - b.likedCount)
   const dbResponse = createDatabase(period)
   const databaseId = dbResponse.id
   for (const article of sortedArticles) {

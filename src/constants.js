@@ -37,3 +37,4 @@ export const DEFAULT_EMOJI = '📕'
 
 export const SLACK_OATUH_API_ENDPOINT = 'https://slack.com/api/oauth.v2.access'
 export const SLACK_OAUTH_REDIRECT_URL = 'https://slack.com/app_redirect'
+export const SLACK_ARTICLES_COOUNT = 3

@@ -1,17 +1,3 @@
-<!-- const data = Array.from({ length: 30 }, (_, i) => ({
-  title: `記事タイトル${i + 1}`,
-  url: `https://zenn.dev/link${i + 1}`,
-  publishedAt: `2023-01-${String(i + 1).padStart(2, '0')}`,
-  likedCount: Math.floor(Math.random() * 200),
-  emoji: ['😀', '😆', '🤔', '😅', '😍'][Math.floor(Math.random() * 5)],
-  username: `ユーザー${i + 1}`,
-  userLink: `https://zenn.dev/user${i + 1}`,
-  avatar: `https://zenn.dev/avatar${i + 1}.png`,
-  topics: ['JavaScript', 'Web開発', 'プログラミング', 'フロントエンド', 'バックエンド'][
-    Math.floor(Math.random() * 5)
-  ],
-  body: `記事の内容${i + 1}`
-})) -->
 <!doctype html>
 <html lang="en">
   <head>
@@ -69,9 +55,6 @@
         options: {
           indexAxis: 'y',
           plugins: {
-            // legend: {
-            //   display: false // 凡例を非表示
-            // },
             tooltip: {
               callbacks: {
                 // ツールチップの内容をカスタマイズ

@@ -50,7 +50,7 @@ export function saveMonthlyArticlesToSpreadsheet() {
   saveArticlesToSpreadsheet(TIME_PERIOD.MONTHLY)
 }
 
-export function saveOAuthInfo(resJson) {
+export function saveOAuthInfoToDatastore(resJson) {
   const token = ScriptApp.getOAuthToken()
   const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
   const url = `${GOOGLE_DATASTORE_API_ENDPOINT}/${projectId}:commit`
@@ -131,7 +131,7 @@ export function fetchSlackWebhookUrls() {
   return webhookUrls
 }
 
-export function saveArticleRanking(articles, period) {
+export function saveArticleRankingToDatastore(articles, period) {
   const token = ScriptApp.getOAuthToken()
   const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
   const url = `${GOOGLE_DATASTORE_API_ENDPOINT}/${projectId}:commit`
