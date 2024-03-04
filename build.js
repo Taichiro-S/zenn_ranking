@@ -45,12 +45,21 @@ esbuild
 
     // markdownをhtmlに変換してdocsに出力
     const md = new MarkdownIt()
-    const markdownFiles = fs.readdirSync('src/privacy_policy/')
-    markdownFiles.forEach((file) => {
-      const markdown = fs.readFileSync(`src/privacy_policy/${file}`, 'utf-8')
+
+    const privacy = fs.readdirSync('src/docs/privacy_policy/')
+
+    privacy.forEach((file) => {
+      const markdown = fs.readFileSync(`src/docs/privacy_policy/${file}`, 'utf-8')
       const result = md.render(markdown)
       const htmlFileName = file.replace('.md', '.html')
       fs.writeFileSync(`docs/privacy_policy/${htmlFileName}`, result, 'utf-8')
+    })
+    const terms = fs.readdirSync('src/docs/terms/')
+    terms.forEach((file) => {
+      const markdown = fs.readFileSync(`src/docs/terms/${file}`, 'utf-8')
+      const result = md.render(markdown)
+      const htmlFileName = file.replace('.md', '.html')
+      fs.writeFileSync(`docs/terms/${htmlFileName}`, result, 'utf-8')
     })
   })
   .catch((e) => {
