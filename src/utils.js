@@ -29,8 +29,9 @@ export function getTimePeriod(date, period) {
   let start, end
   if (period === TIME_PERIOD.WEEKLY) {
     // 7日前の00:00:00と前日の時刻23:59:59を返す
-    start = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 7, 0, 0, 0)
+    // 関数が実行されるタイムゾーンがJSTであることを前提にしている
     end = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1, 23, 59, 59)
+    start = new Date(date.getFullYear(), date.getMonth(), date.getDate() - 7, 0, 0, 0)
   } else if (period === TIME_PERIOD.MONTHLY) {
     // 先月の1日の時刻00:00:00と先月の末日の時刻23:59:59を返す
     start = new Date(date.getFullYear(), date.getMonth() - 1, 1, 0, 0, 0)
