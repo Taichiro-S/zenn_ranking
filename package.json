@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.js",
+    "build:local": "node build_local.js",
     "format": "eslint src __test__ --fix && prettier --write src __test__",
     "test": "jest",
     "test:coverage": "npm run test -- --coverage --silent --testLocationInResults --ci --json --outputFile=\"report.json\""

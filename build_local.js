@@ -22,7 +22,25 @@ const filesToCopy = [
   { srcPath: 'src/html', destPath: 'dist', fileName: 'auth_fail.html' },
   // { srcPath: 'src/html', destPath: 'dist', fileName: 'monthly_ranking.html' },
   // { srcPath: 'src/html', destPath: 'dist', fileName: 'weekly_ranking.html' },
-  { srcPath: 'src/html', destPath: 'dist', fileName: 'not_found.html' }
+  { srcPath: 'src/html', destPath: 'dist', fileName: 'not_found.html' },
+
+  // github pages用のファイル
+  { srcPath: 'src/landing/template2/dist/css', destPath: 'docs/dist/css', fileName: 'style.css' },
+  { srcPath: 'src/landing/template2/dist/images', destPath: 'docs/dist/images', fileName: 'database.png' },
+  {
+    srcPath: 'src/landing/template2/dist/images',
+    destPath: 'docs/dist/images',
+    fileName: 'header-illustration-light.svg'
+  },
+  {
+    srcPath: 'src/landing/template2/dist/images',
+    destPath: 'docs/dist/images',
+    fileName: 'hero-media-illustration-light.svg'
+  },
+  { srcPath: 'src/landing/template2/dist/images', destPath: 'docs/dist/images', fileName: 'notification.png' },
+  { srcPath: 'src/landing/template2/dist/images', destPath: 'docs/dist/images', fileName: 'zenn-chan.jpg' },
+  { srcPath: 'src/landing/template2/dist/js', destPath: 'docs/dist/js', fileName: 'main.min.js' },
+  { srcPath: 'src/landing/template2', destPath: 'docs', fileName: 'index.html' }
 ]
 
 esbuild
