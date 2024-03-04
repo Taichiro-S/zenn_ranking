@@ -6,28 +6,28 @@ import {
   ZENN_URL,
   TIME_PERIOD
 } from './constants'
-import { extractBobyText } from './utils'
+import { extractBobyText, getTimePeriod } from './utils'
 
 export function fetchAndSortZennArticles(period) {
-  const today = new Date()
-  const start =
-    period === TIME_PERIOD.WEEKLY
-      ? new Date(today.getFullYear(), today.getMonth(), today.getDate() - 8)
-      : new Date(today.getFullYear(), today.getMonth() - 1, 1)
-  const cutoff = TIME_PERIOD.WEEKLY ? WEEKLY_RANKING_COUNT : MONTHLY_RANKING_COUNT
+  const now = new Date()
+  const { start, end } = getTimePeriod(now, period)
+  const cutoff = period === TIME_PERIOD.WEEKLY ? WEEKLY_RANKING_COUNT : MONTHLY_RANKING_COUNT
 
   let keepFetching = true
   let nextPage = 1
   const allArticles = []
 
   while (keepFetching) {
-    const url = `${ZENN_ARTICLE_API_ENDPOINT}?order=latest&min_liked_count=${MIN_LIKED_COUNT}&page=${nextPage}`
+    const url = `${ZENN_ARTICLE_API_ENDPOINT}?order=latest&count=100&min_liked_count=${MIN_LIKED_COUNT}&page=${nextPage}`
     const response = UrlFetchApp.fetch(url)
     const data = JSON.parse(response.getContentText())
     const articles = data.articles || []
 
     for (const article of articles) {
       const publishedAt = new Date(article.published_at)
+      if (publishedAt >= end) {
+        continue
+      }
       if (publishedAt >= start) {
         allArticles.push(article)
       } else {

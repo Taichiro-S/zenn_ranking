@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>記事ランキング - いいね数のバーチャート</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      .chart-container {
+        position: relative;
+        margin: auto;
+        height: 800px; /* グラフの高さを調整 */
+        width: 1000px; /* グラフの幅を調整 */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chart-container">
+      <canvas id="likesChart"></canvas>
+    </div>
+
+    <script>
+      const data = Array.from({ length: 30 }, (_, i) => ({
+        title: `記事タイトル${i + 1}`,
+        url: `https://zenn.dev/link${i + 1}`,
+        publishedAt: `2023-01-${String(i + 1).padStart(2, '0')}`,
+        likedCount: Math.floor(Math.random() * 200),
+        emoji: ['😀', '😆', '🤔', '😅', '😍'][Math.floor(Math.random() * 5)],
+        username: `ユーザー${i + 1}`,
+        userLink: `https://zenn.dev/user${i + 1}`,
+        avatar:
+          'https://res.cloudinary.com/zenn/image/fetch/s--a2VU1wR0--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_70/https://storage.googleapis.com/zenn-user-upload/avatar/22994af1d6.jpeg',
+        topics: ['JavaScript', 'Web開発', 'プログラミング', 'フロントエンド', 'バックエンド'][
+          Math.floor(Math.random() * 5)
+        ],
+        body: `記事の内容${i + 1}`
+      }))
+
+      data.sort((a, b) => b.likedCount - a.likedCount)
+
+      const ctx = document.getElementById('likesChart').getContext('2d')
+      const likesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.map((article) => article.title),
+          datasets: [
+            {
+              label: 'いいね数',
+              data: data.map((article) => article.likedCount),
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1
+            }
+          ]
+        },
+        options: {
+          indexAxis: 'y',
+          plugins: {
+            tooltip: {
+              callbacks: {
+                // ツールチップの内容をカスタマイズ
+                beforeTitle: function (context) {
+                  return `公開日: ${context[0].raw.publishedAt}`
+                },
+                title: function (context) {
+                  return `タイトル: ${context[0].label}`
+                },
+                afterTitle: function (context) {
+                  return `著者: ${context[0].raw.username}`
+                },
+                label: function (context) {
+                  return `いいね数: ${context.raw.likedCount}`
+                },
+                afterLabel: function (context) {
+                  return `トピック: ${context.raw.topics.join(', ')}`
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              beginAtZero: true
+            }
+          }
+        },
+        plugins: [
+          {
+            // データタイトルの後ろに著者のアバターを表示
+            afterDraw: (chart) => {
+              var ctx = chart.ctx
+              chart.data.datasets.forEach(function (dataset, i) {
+                var meta = chart.getDatasetMeta(i)
+                if (!meta.hidden) {
+                  meta.data.forEach(function (element, index) {
+                    // アバター画像を描画
+                    ctx.fillStyle = '#fff'
+                    var img = new Image()
+                    img.src = dataset.data[index].avatar
+                    img.onload = function () {
+                      ctx.drawImage(img, element.x + 10, element.y - 15, 30, 30)
+                    }
+                  })
+                }
+              })
+            }
+          }
+        ]
+      })
+    </script>
+  </body>
+</html>

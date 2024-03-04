@@ -1,6 +1,8 @@
 import { formatDate, escapeMarkdownSpecialChars, getTimePeriod } from './utils'
-import { FULL_RANKING_RESULT } from './constants'
-export function formatMessageForSlack(period, articles) {
+import { NOTION_PUB_URL } from './script_property'
+import { SLACK_ARTICLES_COOUNT } from './constants'
+
+export function formatMessageForSlack(articles, period, databasePath) {
   const now = new Date()
   const { start, end } = getTimePeriod(now, period)
 
@@ -21,9 +23,10 @@ export function formatMessageForSlack(period, articles) {
     ]
   }
   let rank = 1
-  const articlestest = articles.slice(0, 3)
-  const linkForFullRanking = `<${escapeMarkdownSpecialChars(FULL_RANKING_RESULT)}|こちら>`
-  articlestest.forEach((article) => {
+  const topArticles = articles.slice(0, SLACK_ARTICLES_COOUNT)
+  const fullPath = NOTION_PUB_URL + databasePath
+  const linkForFullRanking = `<${escapeMarkdownSpecialChars(fullPath)}|こちら>`
+  topArticles.forEach((article) => {
     const title = `*<${article.url || ''}|${escapeMarkdownSpecialChars(article.title)}>*`
     const author = `*<${article.userLink || ''}|${escapeMarkdownSpecialChars(article.username)}>*`
     const publisheDate = formatDate(new Date(article.publishedAt))
@@ -58,7 +61,7 @@ export function formatMessageForSlack(period, articles) {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `${title}\n` + '```' + `${article.body}` + '```'
+        text: `${title}\n` + '```' + article.body + '```'
       },
       accessory: {
         type: 'image',

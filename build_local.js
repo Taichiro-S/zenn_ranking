@@ -22,7 +22,25 @@ const filesToCopy = [
   { srcPath: 'src/html', destPath: 'dist', fileName: 'auth_fail.html' },
   // { srcPath: 'src/html', destPath: 'dist', fileName: 'monthly_ranking.html' },
   // { srcPath: 'src/html', destPath: 'dist', fileName: 'weekly_ranking.html' },
-  { srcPath: 'src/html', destPath: 'dist', fileName: 'not_found.html' }
+  { srcPath: 'src/html', destPath: 'dist', fileName: 'not_found.html' },
+
+  // github pages用のファイル
+  { srcPath: 'src/landing/template2/dist/css', destPath: 'docs/dist/css', fileName: 'style.css' },
+  { srcPath: 'src/landing/template2/dist/images', destPath: 'docs/dist/images', fileName: 'database.png' },
+  {
+    srcPath: 'src/landing/template2/dist/images',
+    destPath: 'docs/dist/images',
+    fileName: 'header-illustration-light.svg'
+  },
+  {
+    srcPath: 'src/landing/template2/dist/images',
+    destPath: 'docs/dist/images',
+    fileName: 'hero-media-illustration-light.svg'
+  },
+  { srcPath: 'src/landing/template2/dist/images', destPath: 'docs/dist/images', fileName: 'notification.png' },
+  { srcPath: 'src/landing/template2/dist/images', destPath: 'docs/dist/images', fileName: 'zenn-chan.jpg' },
+  { srcPath: 'src/landing/template2/dist/js', destPath: 'docs/dist/js', fileName: 'main.min.js' },
+  { srcPath: 'src/landing/template2', destPath: 'docs', fileName: 'index.html' }
 ]
 
 esbuild
@@ -45,21 +63,12 @@ esbuild
 
     // markdownをhtmlに変換してdocsに出力
     const md = new MarkdownIt()
-
-    const privacy = fs.readdirSync('src/docs/privacy_policy/')
-
-    privacy.forEach((file) => {
-      const markdown = fs.readFileSync(`src/docs/privacy_policy/${file}`, 'utf-8')
+    const markdownFiles = fs.readdirSync('src/privacy_policy/')
+    markdownFiles.forEach((file) => {
+      const markdown = fs.readFileSync(`src/privacy_policy/${file}`, 'utf-8')
       const result = md.render(markdown)
       const htmlFileName = file.replace('.md', '.html')
       fs.writeFileSync(`docs/privacy_policy/${htmlFileName}`, result, 'utf-8')
-    })
-    const terms = fs.readdirSync('src/docs/terms/')
-    terms.forEach((file) => {
-      const markdown = fs.readFileSync(`src/docs/terms/${file}`, 'utf-8')
-      const result = md.render(markdown)
-      const htmlFileName = file.replace('.md', '.html')
-      fs.writeFileSync(`docs/terms/${htmlFileName}`, result, 'utf-8')
     })
   })
   .catch((e) => {

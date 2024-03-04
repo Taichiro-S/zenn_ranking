@@ -50,7 +50,7 @@ export function saveMonthlyArticlesToSpreadsheet() {
   saveArticlesToSpreadsheet(TIME_PERIOD.MONTHLY)
 }
 
-export function saveOAuthInfo(resJson) {
+export function saveOAuthInfoToDatastore(resJson) {
   const token = ScriptApp.getOAuthToken()
   const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
   const url = `${GOOGLE_DATASTORE_API_ENDPOINT}/${projectId}:commit`
@@ -83,55 +83,6 @@ export function saveOAuthInfo(resJson) {
     ]
   }
 
-  const options = {
-    method: 'post',
-    contentType: 'application/json',
-    headers: {
-      Authorization: 'Bearer ' + token
-    },
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  }
-  UrlFetchApp.fetch(url, options)
-}
-
-export function saveArticleRanking(articles, period) {
-  const token = ScriptApp.getOAuthToken()
-  const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
-  const url = `${GOOGLE_DATASTORE_API_ENDPOINT}/${projectId}:commit`
-  const savedAt = new Date().toISOString()
-  const payload = {
-    mode: 'NON_TRANSACTIONAL',
-    mutations: articles.map((article) => {
-      const savedAtSlug = `${savedAt}-${article.slug}`
-      return {
-        upsert: {
-          key: {
-            partitionId: { projectId },
-            path: [{ kind: CLOUD_DATASTORE_TABLE_FOR_ARTICLES, name: savedAtSlug }]
-          },
-          properties: {
-            title: { stringValue: article.title },
-            url: { stringValue: article.url },
-            publishedAt: { stringValue: article.publishedAt },
-            likedCount: { integerValue: article.likedCount.toString() },
-            emoji: { stringValue: article.emoji },
-            username: { stringValue: article.username },
-            userLink: { stringValue: article.userLink },
-            avatar: { stringValue: article.avatar },
-            topics: {
-              arrayValue: {
-                values: article.topics.map((topic) => ({ stringValue: topic }))
-              }
-            },
-            body: { stringValue: article.body },
-            savedAt: { stringValue: savedAt },
-            period: { stringValue: period }
-          }
-        }
-      }
-    })
-  }
   const options = {
     method: 'post',
     contentType: 'application/json',
@@ -178,4 +129,126 @@ export function fetchSlackWebhookUrls() {
   const jsonResponse = JSON.parse(response.getContentText())
   const webhookUrls = jsonResponse.batch.entityResults.map((result) => result.entity.properties.webhook_url.stringValue)
   return webhookUrls
+}
+
+export function saveArticleRankingToDatastore(articles, period) {
+  const token = ScriptApp.getOAuthToken()
+  const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
+  const url = `${GOOGLE_DATASTORE_API_ENDPOINT}/${projectId}:commit`
+  const savedAt = new Date().toISOString()
+  const payload = {
+    mode: 'NON_TRANSACTIONAL',
+    mutations: articles.map((article) => {
+      const savedAtSlug = `${savedAt}-${article.slug}`
+      return {
+        upsert: {
+          key: {
+            partitionId: { projectId },
+            path: [{ kind: `${CLOUD_DATASTORE_TABLE_FOR_ARTICLES}_${period}`, name: savedAtSlug }]
+          },
+          properties: {
+            title: { stringValue: article.title },
+            url: { stringValue: article.url },
+            publishedAt: { stringValue: article.publishedAt },
+            likedCount: { integerValue: article.likedCount.toString() },
+            emoji: { stringValue: article.emoji },
+            username: { stringValue: article.username },
+            userLink: { stringValue: article.userLink },
+            avatar: { stringValue: article.avatar },
+            topics: {
+              arrayValue: {
+                values: article.topics.map((topic) => ({ stringValue: topic }))
+              }
+            },
+            body: { stringValue: article.body },
+            savedAt: { stringValue: savedAt }
+          }
+        }
+      }
+    })
+  }
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    headers: {
+      Authorization: 'Bearer ' + token
+    },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  }
+  UrlFetchApp.fetch(url, options)
+}
+
+export function fetchArticleRanking(period) {
+  const token = ScriptApp.getOAuthToken()
+  const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
+  const url = `${GOOGLE_DATASTORE_API_ENDPOINT}/${projectId}:runQuery`
+  const now = new Date()
+  let startDate
+
+  if (period === TIME_PERIOD.WEEKLY) {
+    // 一週間前の日付を取得
+    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7)
+  } else if (period === TIME_PERIOD.WEEKLY) {
+    // 一ヶ月前の日付を取得
+    startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
+  } else {
+    throw new Error('Invalid period specified')
+  }
+
+  const startDateStr = startDate.toISOString()
+
+  const payload = {
+    query: {
+      kind: [{ name: `${CLOUD_DATASTORE_TABLE_FOR_ARTICLES}_${period}` }],
+      filter: {
+        compositeFilter: {
+          op: 'AND',
+          filters: [
+            {
+              propertyFilter: {
+                property: { name: 'savedAt' },
+                op: 'GREATER_THAN_OR_EQUAL',
+                value: { stringValue: startDateStr }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    headers: {
+      Authorization: 'Bearer ' + token
+    },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  }
+
+  const response = UrlFetchApp.fetch(url, options)
+  const data = JSON.parse(response.getContentText())
+  if (data.batch.entityResults && data.batch.entityResults.length > 0) {
+    const articles = data.batch.entityResults.map((entityResult) => {
+      const article = entityResult.entity.properties
+      return {
+        title: article.title.stringValue,
+        url: article.url.stringValue,
+        publishedAt: article.publishedAt.stringValue,
+        likedCount: parseInt(article.likedCount.integerValue, 10),
+        emoji: article.emoji.stringValue,
+        username: article.username.stringValue,
+        userLink: article.userLink.stringValue,
+        avatar: article.avatar.stringValue,
+        topics: article.topics.arrayValue.values.map((v) => v.stringValue),
+        body: article.body.stringValue,
+        savedAt: article.savedAt.stringValue
+      }
+    })
+    const sortedArticles = articles.sort((a, b) => b.likedCount - a.likedCount)
+    return sortedArticles
+  }
+  return []
 }

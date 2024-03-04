@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <title>記事トピックスの分布</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <h1>記事トピックスの分布</h1>
+    <canvas id="topicsChart"></canvas>
+    <script>
+      // 仮のデータ
+      const topicsData = {
+        JavaScript: 5,
+        Web開発: 10,
+        その他: 2
+      }
+
+      const ctx = document.getElementById('topicsChart').getContext('2d')
+      const topicsChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(topicsData),
+          datasets: [
+            {
+              data: Object.values(topicsData),
+              backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)'],
+              borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
+              borderWidth: 1
+            }
+          ]
+        }
+      })
+    </script>
+  </body>
+</html>
