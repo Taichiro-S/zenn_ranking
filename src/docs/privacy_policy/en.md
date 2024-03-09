@@ -1,4 +1,4 @@
-# Privacy Policy for Zenn-chan
+# Privacy Policy for TekTek
 
 ---
 
@@ -24,9 +24,9 @@ For the purposes of this Privacy Policy:
 
 - Affiliate means an entity that controls, is controlled by or is under common control with a party, where "control" means ownership of 50% or more of the shares, equity interest or other securities entitled to vote for election of directors or other managing authority.
 
-- Application refers to Zenn-chan, the software program provided by the Company.
+- Application refers to TekTek, the software program provided by the Company.
 
-- Company (referred to as either "the Company", "We", "Us" or "Our" in this Agreement) refers to Zenn-chan.
+- Company (referred to as either "the Company", "We", "Us" or "Our" in this Agreement) refers to TekTek.
 
 - Country refers to: Japan
 
