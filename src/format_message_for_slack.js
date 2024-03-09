@@ -16,7 +16,7 @@ export function formatMessageForSlack(articles, period, databasePath) {
         elements: [
           {
             type: 'mrkdwn',
-            text: `${formattedStart} ~ ${formattedEnd} のランキングです`
+            text: `${formattedStart} ~ ${formattedEnd} のランキングが発表されたよ〜`
           }
         ]
       }
