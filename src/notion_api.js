@@ -83,7 +83,7 @@ function insertDataIntoDatabase(databaseId, article) {
   const responseBody = response.getContentText()
 
   if (responseCode !== 200) {
-    throw new Error(`Failed to insert article: ${responseBody}`)
+    throw responseBody
   }
 }
 
@@ -95,7 +95,8 @@ export function saveArticlesToNotion(articles, period) {
     try {
       insertDataIntoDatabase(databaseId, article)
     } catch (e) {
-      if (e.response && e.response.data && e.response.data.message.includes('emoji')) {
+      const json = JSON.parse(e)
+      if (json.status === 400 && json.message.includes('emoji')) {
         article.emoji = DEFAULT_EMOJI
         insertDataIntoDatabase(databaseId, article)
       } else {

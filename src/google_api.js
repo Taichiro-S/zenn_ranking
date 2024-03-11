@@ -58,7 +58,7 @@ export function saveOAuthInfoToDatastore(resJson) {
     mode: 'NON_TRANSACTIONAL',
     mutations: [
       {
-        insert: {
+        upsert: {
           key: {
             path: [
               {
