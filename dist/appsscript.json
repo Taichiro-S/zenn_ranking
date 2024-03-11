@@ -10,7 +10,7 @@
     "https://www.googleapis.com/auth/datastore"
   ],
   "webapp": {
-    "executeAs": "USER_ACCESSING",
-    "access": "ANYONE"
+    "executeAs": "USER_DEPLOYING",
+    "access": "ANYONE_ANONYMOUS"
   }
 }
