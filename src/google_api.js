@@ -95,6 +95,40 @@ export function saveOAuthInfoToDatastore(resJson) {
   UrlFetchApp.fetch(url, options)
 }
 
+export function deleteWebhookUrlFromDatastore(teamId) {
+  const token = ScriptApp.getOAuthToken()
+  const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
+  const url = `${GOOGLE_DATASTORE_API_ENDPOINT}/${projectId}:commit`
+
+  const payload = {
+    mode: 'NON_TRANSACTIONAL',
+    mutations: [
+      {
+        delete: {
+          path: [
+            {
+              kind: CLOUD_DATASTORE_TABLE_FOR_OAUTH,
+              name: teamId
+            }
+          ]
+        }
+      }
+    ]
+  }
+
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    headers: {
+      Authorization: 'Bearer ' + token
+    },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  }
+
+  UrlFetchApp.fetch(url, options)
+}
+
 export function fetchSlackWebhookUrls() {
   const token = ScriptApp.getOAuthToken()
   const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
