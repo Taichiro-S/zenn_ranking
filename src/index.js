@@ -6,7 +6,7 @@ import {
 } from './script_property'
 import { formatErrorMessageForSlack, formatMessageForSlack } from './format_message_for_slack'
 import { sendMessageToSlackChannel } from './slack_api'
-import { fetchSlackWebhookUrls, saveOAuthInfoToDatastore } from './google_api'
+import { fetchSlackWebhookUrls, saveOAuthInfoToDatastore, deleteWebhookUrlFromDatastore } from './google_api'
 import { TIME_PERIOD, PAGES, SLACK_OATUH_API_ENDPOINT, SLACK_OAUTH_REDIRECT_URL } from './constants'
 import { fetchAndSortZennArticles } from './zenn_api'
 import { saveArticlesToNotion } from './notion_api'
@@ -15,6 +15,35 @@ import { saveArticlesToNotion } from './notion_api'
 global.distributeMonthlyRanking = distributeMonthlyRanking
 global.distributeWeeklyRanking = distributeWeeklyRanking
 global.doGet = doGet
+global.doPost = doPost
+
+/**
+ * slackのOAuth認証のリダイレクト時に実行
+ * トークン情報を取得してCloud Datastoreに保存する
+ * @param {*} e
+ * @returns
+ */
+function doPost(e) {
+  const params = JSON.parse(e.postData.contents)
+
+  // URL検証イベントの処理
+  if (params.type === 'url_verification') {
+    return ContentService.createTextOutput(params.challenge)
+  }
+
+  // アプリ連携解除イベントの処理
+  if (params.event && params.event.type === 'app_uninstalled') {
+    // 連携解除されたチームIDを取得
+    const teamId = params.team_id
+
+    // Datastoreからwebhook URLを削除
+    deleteWebhookUrlFromDatastore(teamId)
+  }
+
+  return ContentService.createTextOutput(JSON.stringify({ status: 'success' })).setMimeType(
+    ContentService.MimeType.JSON
+  )
+}
 
 /**
  * slackのOAuth認証のリダイレクト時に実行
