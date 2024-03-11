@@ -129,6 +129,51 @@ export function deleteWebhookUrlFromDatastore(teamId) {
   UrlFetchApp.fetch(url, options)
 }
 
+export function updateAccessToken(teamId, accessToken) {
+  const token = ScriptApp.getOAuthToken()
+  const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
+  const url = `https://datastore.googleapis.com/v1/projects/${projectId}:commit`
+  const payload = {
+    mode: 'NON_TRANSACTIONAL',
+    mutations: [
+      {
+        update: {
+          key: {
+            path: [
+              {
+                kind: CLOUD_DATASTORE_TABLE_FOR_OAUTH,
+                name: `SlackOAuthInfo_${teamId}`
+              }
+            ]
+          },
+          properties: {
+            access_token: { stringValue: accessToken }
+          }
+        }
+      }
+    ]
+  }
+
+  const options = {
+    method: 'post',
+    contentType: 'application/json',
+    headers: {
+      Authorization: 'Bearer ' + token
+    },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  }
+
+  try {
+    const response = UrlFetchApp.fetch(url, options)
+    if (!response.indexUpdates) {
+      throw new Error('Error updaing access token')
+    }
+  } catch (e) {
+    Logger.log('Error updating access token: ' + e.toString())
+  }
+}
+
 export function fetchSlackWebhookUrls() {
   const token = ScriptApp.getOAuthToken()
   const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
@@ -226,8 +271,6 @@ export function fetchArticleRanking(period) {
   } else if (period === TIME_PERIOD.WEEKLY) {
     // 一ヶ月前の日付を取得
     startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate())
-  } else {
-    throw new Error('Invalid period specified')
   }
 
   const startDateStr = startDate.toISOString()

@@ -38,3 +38,7 @@ export const DEFAULT_EMOJI = '📕'
 export const SLACK_OATUH_API_ENDPOINT = 'https://slack.com/api/oauth.v2.access'
 export const SLACK_OAUTH_REDIRECT_URL = 'https://slack.com/app_redirect'
 export const SLACK_ARTICLES_COOUNT = 3
+
+export const CLOUD_DATASTORE_CONSOLE_URL =
+  'https://console.cloud.google.com/datastore/databases/-default-/entities;kind=prodSlackTokenInfos;ns=__$DEFAULT$__/query/kind?project=zenn-ranking-415812&supportedpurview=project,organizationId,folder'
+export const GCP_LOGGING_URL = 'https://console.cloud.google.com/logs/query?authuser=0&project=zenn-ranking-415812'
