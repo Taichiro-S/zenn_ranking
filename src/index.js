@@ -82,12 +82,15 @@ function doGet(e) {
       const resJson = JSON.parse(res.getContentText())
       if (resJson.ok) {
         saveOAuthInfoToDatastore(resJson)
-
-        MailApp.sendEmail(
-          ADMIN_EMAIL,
-          '新しいワークスペースにアプリが追加されました',
-          `データベースを確認してください。:${CLOUD_DATASTORE_CONSOLE_URL}`
-        )
+        try {
+          MailApp.sendEmail(
+            ADMIN_EMAIL,
+            '新しいワークスペースにアプリが追加されました',
+            `データベースを確認してください。:${CLOUD_DATASTORE_CONSOLE_URL}`
+          )
+        } catch (e) {
+          Logger.log(`ERROR: ${e}`)
+        }
 
         const teamId = resJson.team.id
         const appId = resJson.app_id
@@ -135,6 +138,11 @@ function distributeMonthlyRanking() {
         `${webhooksErr.length}ワークスペースへの配信でエラーが発生しました。\nエラーログ ${GCP_LOGGING_URL}`
       )
     }
+    MailApp.sendEmail(
+      ADMIN_EMAIL,
+      '月間ランキングが配信されました',
+      `${webhooksErr.length}ワークスペースに対して配信が完了しました。`
+    )
   } catch (e) {
     Logger.log(`ERROR: ${e}`)
 
@@ -175,6 +183,11 @@ function distributeWeeklyRanking() {
         `${webhooksErr.length}ワークスペースへの配信でエラーが発生しました。\nエラーログ ${GCP_LOGGING_URL}`
       )
     }
+    MailApp.sendEmail(
+      ADMIN_EMAIL,
+      '週間ランキングが配信されました',
+      `${webhooksErr.length}ワークスペースに対して配信が完了しました。`
+    )
   } catch (e) {
     Logger.log(`ERROR: ${e}`)
     MailApp.sendEmail(
