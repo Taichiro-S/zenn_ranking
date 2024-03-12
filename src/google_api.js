@@ -2,9 +2,10 @@ import { fetchAndSortZennArticles } from './zenn_api'
 import {
   GCP_SERVICE_ACCOUNT_KEY,
   CLOUD_DATASTORE_TABLE_FOR_ARTICLES,
-  CLOUD_DATASTORE_TABLE_FOR_OAUTH
+  CLOUD_DATASTORE_TABLE_FOR_OAUTH,
+  ENCRYPTO_PASSPHRASE
 } from './script_property'
-import { formatDate, getTimePeriod } from './utils'
+import { formatDate, getTimePeriod, encryptData } from './utils'
 import { DATA_TO_SHOW_IN_SPREADSHEET, TIME_PERIOD, GOOGLE_DATASTORE_API_ENDPOINT } from './constants'
 
 function saveArticlesToSpreadsheet(period) {
@@ -54,6 +55,8 @@ export function saveOAuthInfoToDatastore(resJson) {
   const token = ScriptApp.getOAuthToken()
   const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
   const url = `${GOOGLE_DATASTORE_API_ENDPOINT}/${projectId}:commit`
+  const encryptedAccessToken = encryptData(resJson.access_token, ENCRYPTO_PASSPHRASE)
+  const encryptedWebhookUrl = encryptData(resJson.incoming_webhook.url, ENCRYPTO_PASSPHRASE)
   const payload = {
     mode: 'NON_TRANSACTIONAL',
     mutations: [
@@ -70,13 +73,13 @@ export function saveOAuthInfoToDatastore(resJson) {
           properties: {
             app_id: { stringValue: resJson.app_id },
             authed_user_id: { stringValue: resJson.authed_user.id },
-            access_token: { stringValue: resJson.access_token },
+            access_token: { stringValue: encryptedAccessToken },
             bot_user_id: { stringValue: resJson.bot_user_id },
             team_id: { stringValue: resJson.team.id },
             team_name: { stringValue: resJson.team.name },
             channel: { stringValue: resJson.incoming_webhook.channel },
             channel_id: { stringValue: resJson.incoming_webhook.channel_id },
-            webhook_url: { stringValue: resJson.incoming_webhook.url }
+            webhook_url: { stringValue: encryptedWebhookUrl }
           }
         }
       }
@@ -170,7 +173,7 @@ export function updateAccessToken(teamId, accessToken) {
       throw new Error('Error updaing access token')
     }
   } catch (e) {
-    Logger.log('Error updating access token: ' + e.toString())
+    Logger.log('ERROR: ' + e.toString())
   }
 }
 

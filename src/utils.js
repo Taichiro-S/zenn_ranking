@@ -54,3 +54,15 @@ export function pageExists(pageName) {
   const pages = [MONTHLY_RANKING_PAGE, WEEKLY_RANKING_PAGE]
   return pages.includes(pageName)
 }
+
+export function encryptData(data, passphrase) {
+  // eslint-disable-next-line no-undef
+  const cipher = new cCryptoGS.Cipher(passphrase, 'aes')
+  return cipher.encrypt(data)
+}
+
+export function decryptData(encryptedData, passphrase) {
+  // eslint-disable-next-line no-undef
+  const cipher = new cCryptoGS.Cipher(passphrase, 'aes')
+  return cipher.decrypt(encryptedData)
+}

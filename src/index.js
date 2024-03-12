@@ -1,4 +1,10 @@
-import { SLACK_APP_CLIENT_ID, SLACK_APP_CLIENT_SECRET, REDIRECT_URL, ADMIN_EMAIL } from './script_property'
+import {
+  SLACK_APP_CLIENT_ID,
+  SLACK_APP_CLIENT_SECRET,
+  REDIRECT_URL,
+  ADMIN_EMAIL,
+  ENCRYPTO_PASSPHRASE
+} from './script_property'
 import { formatMessageForSlack } from './format_message_for_slack'
 import { sendMessageToSlackChannel } from './slack_api'
 import {
@@ -17,7 +23,7 @@ import {
 } from './constants'
 import { fetchAndSortZennArticles } from './zenn_api'
 import { saveArticlesToNotion } from './notion_api'
-
+import { decryptData } from './utils'
 // GASから関数を呼び出すために、グローバル変数に登録する
 global.distributeMonthlyRanking = distributeMonthlyRanking
 global.distributeWeeklyRanking = distributeWeeklyRanking
@@ -123,8 +129,9 @@ function distributeMonthlyRanking() {
     const databasePath = saveArticlesToNotion(articles, TIME_PERIOD.MONTHLY)
     const message = formatMessageForSlack(articles, TIME_PERIOD.MONTHLY, databasePath)
     webhookUrls.forEach((webhookUrl) => {
+      const decryptedUrl = decryptData(webhookUrl, ENCRYPTO_PASSPHRASE)
       try {
-        sendMessageToSlackChannel(message, webhookUrl)
+        sendMessageToSlackChannel(message, decryptedUrl)
       } catch (e) {
         Logger.log(`ERROR sending to webhook URL ${webhookUrl}: ${e}`)
         err = true
@@ -166,8 +173,9 @@ function distributeWeeklyRanking() {
     const databasePath = saveArticlesToNotion(articles, TIME_PERIOD.WEEKLY)
     const message = formatMessageForSlack(articles, TIME_PERIOD.WEEKLY, databasePath)
     webhookUrls.forEach((webhookUrl) => {
+      const decryptedUrl = decryptData(webhookUrl)
       try {
-        sendMessageToSlackChannel(message, webhookUrl)
+        sendMessageToSlackChannel(message, decryptedUrl)
       } catch (e) {
         Logger.log(`ERROR sending to webhook URL ${webhookUrl}: ${e}`)
         err = true
@@ -186,7 +194,7 @@ function distributeWeeklyRanking() {
       '週間ランキングが配信されました',
       `${webhookUrls.length}ワークスペースに対して配信が完了しました。`
     )
-    Logger.log('NFO: 週間ランキングの配信が完了しました。')
+    Logger.log('INFO: 週間ランキングの配信が完了しました。')
   } catch (e) {
     Logger.log(`ERROR: ${e}`)
     MailApp.sendEmail(
