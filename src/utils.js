@@ -1,5 +1,4 @@
 import { TIME_PERIOD, BODY_HTML_COUNT, WEEKLY_RANKING_PAGE, MONTHLY_RANKING_PAGE } from './constants'
-import crypto from 'crypto-js'
 
 /**
  * Date型からHH:mm形式に変換
@@ -56,11 +55,14 @@ export function pageExists(pageName) {
   return pages.includes(pageName)
 }
 
-export function encryptData(secretData, secretPassphrase) {
-  return crypto.AES.encrypt(secretData, secretPassphrase).toString()
+export function encryptData(data, passphrase) {
+  // eslint-disable-next-line no-undef
+  const cipher = new cCryptoGS.Cipher(passphrase, 'aes')
+  return cipher.encrypt(data)
 }
 
-export function decryptData(encryptedData, secretPassphrase) {
-  const bytes = crypto.AES.decrypt(encryptedData, secretPassphrase)
-  return bytes.toString(crypto.enc.Utf8)
+export function decryptData(encryptedData, passphrase) {
+  // eslint-disable-next-line no-undef
+  const cipher = new cCryptoGS.Cipher(passphrase, 'aes')
+  return cipher.decrypt(encryptedData)
 }
