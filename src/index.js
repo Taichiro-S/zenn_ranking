@@ -74,8 +74,7 @@ function doGet(e) {
         payload: {
           code,
           client_id: SLACK_APP_CLIENT_ID,
-          client_secret: 'dummy',
-          // SLACK_APP_CLIENT_SECRET,
+          client_secret: SLACK_APP_CLIENT_SECRET,
           redirect_uri: REDIRECT_URL
         }
       })
@@ -101,7 +100,7 @@ function doGet(e) {
         template.redirectUrl = redirectUrl
         return template.evaluate()
       } else {
-        Logger.log('ERROR: SlackのOAuth認証に失敗しました。')
+        Logger.log(`ERROR: ${resJson}`)
         return HtmlService.createHtmlOutputFromFile(PAGES.SLACK_OAUTH_FAIL)
       }
     } catch (error) {
