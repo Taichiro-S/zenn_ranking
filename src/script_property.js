@@ -56,3 +56,9 @@ export const NOTION_API_KEY = scriptProperties.getProperty('NOTION_API_KEY')
 export const NOTION_MONTHLY_DATABASE_PARENT_ID = scriptProperties.getProperty('NOTION_MONTHLY_DATABASE_PARENT_ID')
 export const NOTION_WEEKLY_DATABASE_PARENT_ID = scriptProperties.getProperty('NOTION_WEEKLY_DATABASE_PARENT_ID')
 export const NOTION_PUB_URL = scriptProperties.getProperty('NOTION_PUB_URL')
+
+/**
+ * アクセストークンを暗号化するときに使用するパスフレーズ
+ * @type {string}
+ */
+export const ENCRYPTO_PASSPHRASE = scriptProperties.getProperty('ENCRYPTO_PASSPHRASE')

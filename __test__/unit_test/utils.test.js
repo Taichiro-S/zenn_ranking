@@ -4,7 +4,9 @@ import {
   formatDate,
   getTimePeriod,
   extractBobyText,
-  pageExists
+  pageExists,
+  encryptData,
+  decryptData
 } from '../../src/utils'
 import { TIME_PERIOD, WEEKLY_RANKING_PAGE, MONTHLY_RANKING_PAGE } from '../../src/constants'
 
@@ -62,5 +64,17 @@ describe('pageExists', () => {
     expect(pageExists(WEEKLY_RANKING_PAGE)).toBe(true)
     expect(pageExists(MONTHLY_RANKING_PAGE)).toBe(true)
     expect(pageExists('DAILY_RANKING_PAGE')).toBe(false)
+  })
+})
+
+describe('encryptData', () => {
+  it('encrypt and decrypt data', () => {
+    const data = 'dummy-data'
+    const passphrase = 'dummy-passphrase'
+    const encryptedData = encryptData(data, passphrase)
+    expect(encryptedData).not.toBe(data)
+    expect(encryptedData).not.toBe(passphrase)
+    const decryptedData = decryptData(encryptedData, passphrase)
+    expect(decryptedData).toBe(data)
   })
 })

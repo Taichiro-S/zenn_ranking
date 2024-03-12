@@ -1,4 +1,5 @@
 import { TIME_PERIOD, BODY_HTML_COUNT, WEEKLY_RANKING_PAGE, MONTHLY_RANKING_PAGE } from './constants'
+import crypto from 'crypto-js'
 
 /**
  * Date型からHH:mm形式に変換
@@ -53,4 +54,13 @@ export function extractBobyText(encodedStr) {
 export function pageExists(pageName) {
   const pages = [MONTHLY_RANKING_PAGE, WEEKLY_RANKING_PAGE]
   return pages.includes(pageName)
+}
+
+export function encryptData(secretData, secretPassphrase) {
+  return crypto.AES.encrypt(secretData, secretPassphrase).toString()
+}
+
+export function decryptData(encryptedData, secretPassphrase) {
+  const bytes = crypto.AES.decrypt(encryptedData, secretPassphrase)
+  return bytes.toString(crypto.enc.Utf8)
 }
