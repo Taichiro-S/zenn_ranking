@@ -173,7 +173,7 @@ function distributeWeeklyRanking() {
     const databasePath = saveArticlesToNotion(articles, TIME_PERIOD.WEEKLY)
     const message = formatMessageForSlack(articles, TIME_PERIOD.WEEKLY, databasePath)
     webhookUrls.forEach((webhookUrl) => {
-      const decryptedUrl = decryptData(webhookUrl)
+      const decryptedUrl = decryptData(webhookUrl, ENCRYPTO_PASSPHRASE)
       try {
         sendMessageToSlackChannel(message, decryptedUrl)
       } catch (e) {
