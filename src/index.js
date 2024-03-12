@@ -83,10 +83,11 @@ function doGet(e) {
       if (resJson.ok) {
         saveOAuthInfoToDatastore(resJson)
         try {
+          Logger.log(`新しいワークスペースにアプリが追加されました: ${resJson.team.id}`)
           MailApp.sendEmail(
             ADMIN_EMAIL,
             '新しいワークスペースにアプリが追加されました',
-            `データベースを確認してください。:${CLOUD_DATASTORE_CONSOLE_URL}`
+            `データベースとログを確認してください。\nデータベース:${CLOUD_DATASTORE_CONSOLE_URL} \n ログ: ${GCP_LOGGING_URL}`
           )
         } catch (e) {
           Logger.log(`ERROR: ${e}`)
@@ -99,7 +100,7 @@ function doGet(e) {
         template.redirectUrl = redirectUrl
         return template.evaluate()
       } else {
-        Logger.log('ERROR: Slack OAuth failed')
+        Logger.log('ERROR: SlackのOAuth認証に失敗しました。')
         return HtmlService.createHtmlOutputFromFile(PAGES.SLACK_OAUTH_FAIL)
       }
     } catch (error) {
@@ -135,7 +136,7 @@ function distributeMonthlyRanking() {
       MailApp.sendEmail(
         ADMIN_EMAIL,
         '[本番用]Zennランキングの月間ランキング配信でエラーが発生しました',
-        `${webhooksErr.length}ワークスペースへの配信でエラーが発生しました。\nエラーログ ${GCP_LOGGING_URL}`
+        `$\nエラーログ ${GCP_LOGGING_URL}`
       )
     }
     MailApp.sendEmail(
@@ -143,6 +144,7 @@ function distributeMonthlyRanking() {
       '月間ランキングが配信されました',
       `${webhooksErr.length}ワークスペースに対して配信が完了しました。`
     )
+    Logger.log('月間ランキングの配信が完了しました。')
   } catch (e) {
     Logger.log(`ERROR: ${e}`)
 
@@ -180,7 +182,7 @@ function distributeWeeklyRanking() {
       MailApp.sendEmail(
         ADMIN_EMAIL,
         '[本番用]Zennランキングの週間ランキング配信でエラーが発生しました',
-        `${webhooksErr.length}ワークスペースへの配信でエラーが発生しました。\nエラーログ ${GCP_LOGGING_URL}`
+        `$\nエラーログ ${GCP_LOGGING_URL}`
       )
     }
     MailApp.sendEmail(
@@ -188,6 +190,7 @@ function distributeWeeklyRanking() {
       '週間ランキングが配信されました',
       `${webhooksErr.length}ワークスペースに対して配信が完了しました。`
     )
+    Logger.log('週間ランキングの配信が完了しました。')
   } catch (e) {
     Logger.log(`ERROR: ${e}`)
     MailApp.sendEmail(
