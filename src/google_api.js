@@ -173,7 +173,7 @@ export function updateAccessToken(teamId, accessToken) {
       throw new Error('Error updaing access token')
     }
   } catch (e) {
-    Logger.log('Error updating access token: ' + e.toString())
+    Logger.log('ERROR: ' + e.toString())
   }
 }
 

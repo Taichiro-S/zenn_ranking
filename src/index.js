@@ -1,4 +1,10 @@
-import { SLACK_APP_CLIENT_ID, SLACK_APP_CLIENT_SECRET, REDIRECT_URL, ADMIN_EMAIL } from './script_property'
+import {
+  SLACK_APP_CLIENT_ID,
+  SLACK_APP_CLIENT_SECRET,
+  REDIRECT_URL,
+  ADMIN_EMAIL,
+  ENCRYPTO_PASSPHRASE
+} from './script_property'
 import { formatMessageForSlack } from './format_message_for_slack'
 import { sendMessageToSlackChannel } from './slack_api'
 import {
@@ -123,7 +129,7 @@ function distributeMonthlyRanking() {
     const databasePath = saveArticlesToNotion(articles, TIME_PERIOD.MONTHLY)
     const message = formatMessageForSlack(articles, TIME_PERIOD.MONTHLY, databasePath)
     webhookUrls.forEach((webhookUrl) => {
-      const decryptedUrl = decryptData(webhookUrl)
+      const decryptedUrl = decryptData(webhookUrl, ENCRYPTO_PASSPHRASE)
       try {
         sendMessageToSlackChannel(message, decryptedUrl)
       } catch (e) {
@@ -167,10 +173,8 @@ function distributeWeeklyRanking() {
     const databasePath = saveArticlesToNotion(articles, TIME_PERIOD.WEEKLY)
     const message = formatMessageForSlack(articles, TIME_PERIOD.WEEKLY, databasePath)
     webhookUrls.forEach((webhookUrl) => {
-      Logger.log(`INFO: encryptedUrl: ${webhookUrl}`)
       const decryptedUrl = decryptData(webhookUrl)
       try {
-        Logger.log(`INFO: decryptedUrl: ${decryptedUrl}`)
         sendMessageToSlackChannel(message, decryptedUrl)
       } catch (e) {
         Logger.log(`ERROR sending to webhook URL ${webhookUrl}: ${e}`)
@@ -190,7 +194,7 @@ function distributeWeeklyRanking() {
       '週間ランキングが配信されました',
       `${webhookUrls.length}ワークスペースに対して配信が完了しました。`
     )
-    Logger.log('NFO: 週間ランキングの配信が完了しました。')
+    Logger.log('INFO: 週間ランキングの配信が完了しました。')
   } catch (e) {
     Logger.log(`ERROR: ${e}`)
     MailApp.sendEmail(
