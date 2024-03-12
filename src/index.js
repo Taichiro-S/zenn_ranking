@@ -74,7 +74,8 @@ function doGet(e) {
         payload: {
           code,
           client_id: SLACK_APP_CLIENT_ID,
-          client_secret: SLACK_APP_CLIENT_SECRET,
+          client_secret: 'dummy',
+          // SLACK_APP_CLIENT_SECRET,
           redirect_uri: REDIRECT_URL
         }
       })
@@ -83,7 +84,7 @@ function doGet(e) {
       if (resJson.ok) {
         saveOAuthInfoToDatastore(resJson)
         try {
-          Logger.log(`新しいワークスペースにアプリが追加されました: ${resJson.team.id}`)
+          Logger.log(`INFO: 新しいワークスペースにアプリが追加されました: ${resJson.team.id}`)
           MailApp.sendEmail(
             ADMIN_EMAIL,
             '新しいワークスペースにアプリが追加されました',
@@ -117,7 +118,6 @@ function doGet(e) {
  */
 function distributeMonthlyRanking() {
   let err = false
-  const webhooksErr = []
   try {
     const webhookUrls = fetchSlackWebhookUrls()
     const articles = fetchAndSortZennArticles(TIME_PERIOD.MONTHLY)
@@ -129,7 +129,6 @@ function distributeMonthlyRanking() {
       } catch (e) {
         Logger.log(`ERROR sending to webhook URL ${webhookUrl}: ${e}`)
         err = true
-        webhooksErr.push(webhookUrl)
       }
     })
     if (err) {
@@ -142,9 +141,9 @@ function distributeMonthlyRanking() {
     MailApp.sendEmail(
       ADMIN_EMAIL,
       '月間ランキングが配信されました',
-      `${webhooksErr.length}ワークスペースに対して配信が完了しました。`
+      `${webhookUrls.length}ワークスペースに対して配信が完了しました。`
     )
-    Logger.log('月間ランキングの配信が完了しました。')
+    Logger.log('INFO: 月間ランキングの配信が完了しました。')
   } catch (e) {
     Logger.log(`ERROR: ${e}`)
 
@@ -162,7 +161,6 @@ function distributeMonthlyRanking() {
  */
 function distributeWeeklyRanking() {
   let err = false
-  const webhooksErr = []
   try {
     const webhookUrls = fetchSlackWebhookUrls()
     const articles = fetchAndSortZennArticles(TIME_PERIOD.WEEKLY)
@@ -174,7 +172,6 @@ function distributeWeeklyRanking() {
       } catch (e) {
         Logger.log(`ERROR sending to webhook URL ${webhookUrl}: ${e}`)
         err = true
-        webhooksErr.push(webhookUrl)
       }
     })
 
@@ -188,9 +185,9 @@ function distributeWeeklyRanking() {
     MailApp.sendEmail(
       ADMIN_EMAIL,
       '週間ランキングが配信されました',
-      `${webhooksErr.length}ワークスペースに対して配信が完了しました。`
+      `${webhookUrls.length}ワークスペースに対して配信が完了しました。`
     )
-    Logger.log('週間ランキングの配信が完了しました。')
+    Logger.log('NFO: 週間ランキングの配信が完了しました。')
   } catch (e) {
     Logger.log(`ERROR: ${e}`)
     MailApp.sendEmail(
