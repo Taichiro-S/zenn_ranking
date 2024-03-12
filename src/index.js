@@ -17,7 +17,7 @@ import {
 } from './constants'
 import { fetchAndSortZennArticles } from './zenn_api'
 import { saveArticlesToNotion } from './notion_api'
-
+import { decryptData } from './utils'
 // GASから関数を呼び出すために、グローバル変数に登録する
 global.distributeMonthlyRanking = distributeMonthlyRanking
 global.distributeWeeklyRanking = distributeWeeklyRanking
@@ -123,8 +123,9 @@ function distributeMonthlyRanking() {
     const databasePath = saveArticlesToNotion(articles, TIME_PERIOD.MONTHLY)
     const message = formatMessageForSlack(articles, TIME_PERIOD.MONTHLY, databasePath)
     webhookUrls.forEach((webhookUrl) => {
+      const decryptedUrl = decryptData(webhookUrl)
       try {
-        sendMessageToSlackChannel(message, webhookUrl)
+        sendMessageToSlackChannel(message, decryptedUrl)
       } catch (e) {
         Logger.log(`ERROR sending to webhook URL ${webhookUrl}: ${e}`)
         err = true
@@ -166,8 +167,11 @@ function distributeWeeklyRanking() {
     const databasePath = saveArticlesToNotion(articles, TIME_PERIOD.WEEKLY)
     const message = formatMessageForSlack(articles, TIME_PERIOD.WEEKLY, databasePath)
     webhookUrls.forEach((webhookUrl) => {
+      Logger.log(`INFO: encryptedUrl: ${webhookUrl}`)
+      const decryptedUrl = decryptData(webhookUrl)
       try {
-        sendMessageToSlackChannel(message, webhookUrl)
+        Logger.log(`INFO: decryptedUrl: ${decryptedUrl}`)
+        sendMessageToSlackChannel(message, decryptedUrl)
       } catch (e) {
         Logger.log(`ERROR sending to webhook URL ${webhookUrl}: ${e}`)
         err = true
