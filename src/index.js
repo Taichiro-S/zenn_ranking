@@ -46,8 +46,10 @@ function doPost(e) {
 
   // app_uninstallイベントの処理
   if (params.event && params.event.type === 'app_uninstalled') {
+    Logger.log('uninstall request received')
     const teamId = params.team_id
     deleteWebhookUrlFromDatastore(teamId)
+    Logger.log('data deleted')
   }
 
   // tokens_revokedイベントの処理(uninstall したときにも発生する)
@@ -87,7 +89,9 @@ function doGet(e) {
 
       const resJson = JSON.parse(res.getContentText())
       if (resJson.ok) {
+        Logger.log('response ok')
         saveOAuthInfoToDatastore(resJson)
+        Logger.log('data saved')
         try {
           Logger.log(`INFO: 新しいワークスペースにアプリが追加されました: ${resJson.team.id}`)
           MailApp.sendEmail(
