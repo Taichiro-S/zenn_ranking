@@ -101,7 +101,7 @@ export function saveOAuthInfoToDatastore(resJson) {
 export function deleteWebhookUrlFromDatastore(teamId) {
   const token = ScriptApp.getOAuthToken()
   const projectId = GCP_SERVICE_ACCOUNT_KEY.project_id
-  const url = `${GOOGLE_DATASTORE_API_ENDPOINT}/${projectId}:commit`
+  const url = `https://datastore.googleapis.com/v1/projects/${projectId}:commit`
 
   const payload = {
     mode: 'NON_TRANSACTIONAL',
@@ -111,14 +111,13 @@ export function deleteWebhookUrlFromDatastore(teamId) {
           path: [
             {
               kind: CLOUD_DATASTORE_TABLE_FOR_OAUTH,
-              name: teamId
+              name: `SlackOAuthInfo_${teamId}`
             }
           ]
         }
       }
     ]
   }
-
   const options = {
     method: 'post',
     contentType: 'application/json',
@@ -129,7 +128,16 @@ export function deleteWebhookUrlFromDatastore(teamId) {
     muteHttpExceptions: true
   }
 
-  UrlFetchApp.fetch(url, options)
+  try {
+    const res = UrlFetchApp.fetch(url, options)
+    const resJson = JSON.parse(res)
+    if (!resJson.indexUpdates) {
+      throw new Error('ワークスペースの削除に失敗しました。')
+    }
+    Logger.log(`INFO: データベースからワークスペースを削除しました: ${teamId}`)
+  } catch (e) {
+    Logger.log('ERROR: ' + e.toString())
+  }
 }
 
 export function updateAccessToken(teamId, accessToken) {
@@ -170,8 +178,9 @@ export function updateAccessToken(teamId, accessToken) {
   try {
     const response = UrlFetchApp.fetch(url, options)
     if (!response.indexUpdates) {
-      throw new Error('Error updaing access token')
+      throw new Error('データベースの更新に失敗しました')
     }
+    Logger.log(`INFO: データベースのワークスペースを更新しました: ${teamId}`)
   } catch (e) {
     Logger.log('ERROR: ' + e.toString())
   }
