@@ -141,7 +141,7 @@ function distributeMonthlyRanking() {
       MailApp.sendEmail(
         ADMIN_EMAIL,
         '[本番用]Zennランキングの月間ランキング配信でエラーが発生しました',
-        `$\nエラーログ ${GCP_LOGGING_URL}`
+        `エラーログ ${GCP_LOGGING_URL}`
       )
     }
     MailApp.sendEmail(
@@ -186,7 +186,7 @@ function distributeWeeklyRanking() {
       MailApp.sendEmail(
         ADMIN_EMAIL,
         '[本番用]Zennランキングの週間ランキング配信でエラーが発生しました',
-        `$\nエラーログ ${GCP_LOGGING_URL}`
+        `エラーログ ${GCP_LOGGING_URL}`
       )
     }
     MailApp.sendEmail(
@@ -200,7 +200,7 @@ function distributeWeeklyRanking() {
     MailApp.sendEmail(
       ADMIN_EMAIL,
       '[本番用]Zennランキングの週間ランキング配信でエラーが発生しました',
-      `エラーメッセージ: ${e.message} \nエラー箇所: ${e.stack} \n エラーログ ${GCP_LOGGING_URL}`
+      `エラーログ ${GCP_LOGGING_URL}`
     )
   }
 }

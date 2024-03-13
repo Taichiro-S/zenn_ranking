@@ -2,6 +2,9 @@ node_modules/
 coverage/
 .env
 .clasprc.json
+.clasp.json
 report.json
 dist/main.js
 src/landing
+staging_script_properties.js
+production_script_properties.js
