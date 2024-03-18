@@ -40,6 +40,7 @@ export function fetchAndSortZennArticles(period) {
     if (!nextPage) {
       keepFetching = false
     }
+    Utilities.sleep(1000)
   }
 
   const articleInfos = allArticles.map((article) => {
@@ -80,5 +81,6 @@ function fetchArticleDetails(slug) {
   const bodyHtml = data.article.body_html || ''
   const topicNames = topics.map((topic) => topic.name)
   const bodyText = extractBobyText(bodyHtml)
+  Utilities.sleep(1000)
   return { topicNames, bodyText }
 }
