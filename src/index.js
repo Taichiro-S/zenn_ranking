@@ -265,7 +265,8 @@ function distributeWeeklyQiitaRanking() {
   try {
     const webhookUrls = fetchSlackWebhookUrls()
     const articles = fetchAndSortQiitaArticles(TIME_PERIOD.WEEKLY)
-    const databasePath = saveQiitaArticlesToNotion(articles, TIME_PERIOD.WEEKLY)
+    const articlesReversed = articles.toReversed()
+    const databasePath = saveQiitaArticlesToNotion(articlesReversed, TIME_PERIOD.WEEKLY)
     const message = formatQiitaArticleForSlack(articles, TIME_PERIOD.WEEKLY, databasePath)
     webhookUrls.forEach((webhookUrl) => {
       const decryptedUrl = decryptData(webhookUrl, ENCRYPTO_PASSPHRASE)

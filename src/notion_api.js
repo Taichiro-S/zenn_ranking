@@ -205,7 +205,7 @@ function insertQiitaDataIntoDatabase(databaseId, article) {
 export function saveQiitaArticlesToNotion(articles, period) {
   const dbResponse = createQiitaDatabase(period)
   const databaseId = dbResponse.id
-  for (const article of articles.reverse()) {
+  for (const article of articles) {
     insertQiitaDataIntoDatabase(databaseId, article)
   }
   return databaseId.replaceAll('-', '')
