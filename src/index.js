@@ -5,7 +5,8 @@ import {
   ADMIN_EMAIL,
   ENCRYPTO_PASSPHRASE
 } from './script_property'
-import { formatMessageForSlack } from './format_message_for_slack'
+import { formatQiitaArticleForSlack } from './format_qiita_article_for_slack'
+import { formatZennArticleForSlack } from './format_zenn_article_for_slack'
 import { sendMessageToSlackChannel } from './slack_api'
 import {
   fetchSlackWebhookUrls,
@@ -22,11 +23,14 @@ import {
   GCP_LOGGING_URL
 } from './constants'
 import { fetchAndSortZennArticles } from './zenn_api'
-import { saveArticlesToNotion } from './notion_api'
+import { fetchAndSortQiitaArticles } from './qiita_api'
+import { saveZennArticlesToNotion, saveQiitaArticlesToNotion } from './notion_api'
 import { decryptData } from './utils'
 // GASから関数を呼び出すために、グローバル変数に登録する
-global.distributeMonthlyRanking = distributeMonthlyRanking
-global.distributeWeeklyRanking = distributeWeeklyRanking
+global.distributeMonthlyZennRanking = distributeMonthlyZennRanking
+global.distributeWeeklyZennRanking = distributeWeeklyZennRanking
+global.distributeMonthlyQiitaRanking = distributeMonthlyQiitaRanking
+global.distributeWeeklyQiitaRanking = distributeWeeklyQiitaRanking
 global.doGet = doGet
 global.doPost = doPost
 
@@ -123,15 +127,15 @@ function doGet(e) {
 }
 
 /**
- * 月間ランキングを配信する
+ * Zennの月間ランキングを配信する
  */
-function distributeMonthlyRanking() {
+function distributeMonthlyZennRanking() {
   let err = false
   try {
     const webhookUrls = fetchSlackWebhookUrls()
     const articles = fetchAndSortZennArticles(TIME_PERIOD.MONTHLY)
-    const databasePath = saveArticlesToNotion(articles, TIME_PERIOD.MONTHLY)
-    const message = formatMessageForSlack(articles, TIME_PERIOD.MONTHLY, databasePath)
+    const databasePath = saveZennArticlesToNotion(articles, TIME_PERIOD.MONTHLY)
+    const message = formatZennArticleForSlack(articles, TIME_PERIOD.MONTHLY, databasePath)
     webhookUrls.forEach((webhookUrl) => {
       const decryptedUrl = decryptData(webhookUrl, ENCRYPTO_PASSPHRASE)
       try {
@@ -166,16 +170,16 @@ function distributeMonthlyRanking() {
 }
 
 /**
- * 週間ランキングを配信する
+ * Zennの週間ランキングを配信する
  * @param {*} event
  */
-function distributeWeeklyRanking() {
+function distributeWeeklyZennRanking() {
   let err = false
   try {
     const webhookUrls = fetchSlackWebhookUrls()
     const articles = fetchAndSortZennArticles(TIME_PERIOD.WEEKLY)
-    const databasePath = saveArticlesToNotion(articles, TIME_PERIOD.WEEKLY)
-    const message = formatMessageForSlack(articles, TIME_PERIOD.WEEKLY, databasePath)
+    const databasePath = saveZennArticlesToNotion(articles, TIME_PERIOD.WEEKLY)
+    const message = formatZennArticleForSlack(articles, TIME_PERIOD.WEEKLY, databasePath)
     webhookUrls.forEach((webhookUrl) => {
       const decryptedUrl = decryptData(webhookUrl, ENCRYPTO_PASSPHRASE)
       try {
@@ -204,6 +208,94 @@ function distributeWeeklyRanking() {
     MailApp.sendEmail(
       ADMIN_EMAIL,
       '[本番用]Zennランキングの週間ランキング配信でエラーが発生しました',
+      `エラーログ ${GCP_LOGGING_URL}`
+    )
+  }
+}
+
+/**
+ * Qiitaの月間ランキングを配信する
+ */
+function distributeMonthlyQiitaRanking() {
+  let err = false
+  try {
+    const webhookUrls = fetchSlackWebhookUrls()
+    const articles = fetchAndSortQiitaArticles(TIME_PERIOD.MONTHLY)
+    const databasePath = saveQiitaArticlesToNotion(articles, TIME_PERIOD.MONTHLY)
+    const message = formatQiitaArticleForSlack(articles, TIME_PERIOD.MONTHLY, databasePath)
+    webhookUrls.forEach((webhookUrl) => {
+      const decryptedUrl = decryptData(webhookUrl, ENCRYPTO_PASSPHRASE)
+      try {
+        sendMessageToSlackChannel(message, decryptedUrl)
+      } catch (e) {
+        Logger.log(`ERROR sending to webhook URL ${webhookUrl}: ${e}`)
+        err = true
+      }
+    })
+    if (err) {
+      MailApp.sendEmail(
+        ADMIN_EMAIL,
+        '[本番用]Qiitaランキングの月間ランキング配信でエラーが発生しました',
+        `エラーログ ${GCP_LOGGING_URL}`
+      )
+    }
+    MailApp.sendEmail(
+      ADMIN_EMAIL,
+      '月間ランキングが配信されました',
+      `${webhookUrls.length}ワークスペースに対して配信が完了しました。`
+    )
+    Logger.log('INFO: 月間ランキングの配信が完了しました。')
+  } catch (e) {
+    Logger.log(`ERROR: ${e}`)
+
+    MailApp.sendEmail(
+      ADMIN_EMAIL,
+      '[本番用]Qiitaランキングの月間ランキング配信でエラーが発生しました',
+      `エラーログ ${GCP_LOGGING_URL}`
+    )
+  }
+}
+
+/**
+ * Qiitaの週間ランキングを配信する
+ * @param {*} event
+ */
+function distributeWeeklyQiitaRanking() {
+  let err = false
+  try {
+    const webhookUrls = fetchSlackWebhookUrls()
+    const articles = fetchAndSortQiitaArticles(TIME_PERIOD.WEEKLY)
+    const articlesReversed = articles.toReversed()
+    const databasePath = saveQiitaArticlesToNotion(articlesReversed, TIME_PERIOD.WEEKLY)
+    const message = formatQiitaArticleForSlack(articles, TIME_PERIOD.WEEKLY, databasePath)
+    webhookUrls.forEach((webhookUrl) => {
+      const decryptedUrl = decryptData(webhookUrl, ENCRYPTO_PASSPHRASE)
+      try {
+        sendMessageToSlackChannel(message, decryptedUrl)
+      } catch (e) {
+        Logger.log(`ERROR sending to webhook URL ${webhookUrl}: ${e}`)
+        err = true
+      }
+    })
+
+    if (err) {
+      MailApp.sendEmail(
+        ADMIN_EMAIL,
+        '[本番用]Qiitaランキングの週間ランキング配信でエラーが発生しました',
+        `エラーログ ${GCP_LOGGING_URL}`
+      )
+    }
+    MailApp.sendEmail(
+      ADMIN_EMAIL,
+      '週間ランキングが配信されました',
+      `${webhookUrls.length}ワークスペースに対して配信が完了しました。`
+    )
+    Logger.log('INFO: 週間ランキングの配信が完了しました。')
+  } catch (e) {
+    Logger.log(`ERROR: ${e}`)
+    MailApp.sendEmail(
+      ADMIN_EMAIL,
+      '[本番用]Qiitaランキングの週間ランキング配信でエラーが発生しました',
       `エラーログ ${GCP_LOGGING_URL}`
     )
   }

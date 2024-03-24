@@ -1,8 +1,10 @@
 export const WEEKLY_RANKING_COUNT = 30
 export const MONTHLY_RANKING_COUNT = 50
 export const ZENN_ARTICLE_API_ENDPOINT = 'https://zenn.dev/api/articles'
+export const QIITA_ARTICLE_API_ENDPOINT = 'https://qiita.com/api/v2/items'
 export const MIN_LIKED_COUNT = 10
 export const ZENN_URL = 'https://zenn.dev'
+export const QIITA_URL = 'https://qiita.com/'
 export const TIME_PERIOD = {
   WEEKLY: 'weekly',
   MONTHLY: 'monthly'
@@ -42,3 +44,5 @@ export const SLACK_ARTICLES_COOUNT = 3
 export const CLOUD_DATASTORE_CONSOLE_URL =
   'https://console.cloud.google.com/datastore/databases/-default-/entities;kind=prodSlackTokenInfos;ns=__$DEFAULT$__/query/kind?project=zenn-ranking-415812&supportedpurview=project,organizationId,folder'
 export const GCP_LOGGING_URL = 'https://console.cloud.google.com/logs/query?authuser=0&project=zenn-ranking-415812'
+
+export const QIITA_MAX_PAGE = 100
