@@ -104,10 +104,6 @@ export function formatQiitaArticleForSlack(articles, period, databasePath) {
         {
           type: 'mrkdwn',
           text: `*トピック:* ${topics}`
-        },
-        {
-          type: 'mrkdwn',
-          text: ''
         }
       ]
     })
