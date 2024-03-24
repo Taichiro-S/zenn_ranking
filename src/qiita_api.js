@@ -57,8 +57,8 @@ export function fetchAndSortQiitaArticles(period) {
       likesCount: article.likes_count,
       stocksCount: article.stocks_count,
       tags,
-      username: article.user.name,
-      userLink: `${QIITA_URL}/${article.user.name}`,
+      username: article.user.name === '' ? article.user.id : article.user.name,
+      userLink: `${QIITA_URL}/${article.user.id}`,
       avatar: article.user.profile_image_url,
       body: bodyText
     }

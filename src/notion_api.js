@@ -172,7 +172,7 @@ function insertQiitaDataIntoDatabase(databaseId, article) {
       記事タイトル: { title: [{ text: { content: article.title } }] },
       いいね数: { number: article.likesCount },
       ストック数: { number: article.stocksCount },
-      トピック: { multi_select: article.tags.map((tag) => ({ name: tag })) },
+      タグ: { multi_select: article.tags.map((tag) => ({ name: tag })) },
       公開日: { date: { start: article.createdAt } },
       記事リンク: { url: article.url },
       ユーザーリンク: {
@@ -203,10 +203,9 @@ function insertQiitaDataIntoDatabase(databaseId, article) {
 }
 
 export function saveQiitaArticlesToNotion(articles, period) {
-  const sortedArticles = articles.concat().sort((a, b) => a.likedCount - b.likedCount)
   const dbResponse = createQiitaDatabase(period)
   const databaseId = dbResponse.id
-  for (const article of sortedArticles) {
+  for (const article of articles.reverse()) {
     insertQiitaDataIntoDatabase(databaseId, article)
   }
   return databaseId.replaceAll('-', '')
