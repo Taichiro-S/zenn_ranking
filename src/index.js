@@ -24,7 +24,7 @@ import {
 } from './constants'
 import { fetchAndSortZennArticles } from './zenn_api'
 import { fetchAndSortQiitaArticles } from './qiita_api'
-import { saveArticlesToNotion } from './notion_api'
+import { saveZennArticlesToNotion, saveQiitaArticlesToNotion } from './notion_api'
 import { decryptData } from './utils'
 // GASから関数を呼び出すために、グローバル変数に登録する
 global.distributeMonthlyZennRanking = distributeMonthlyZennRanking
@@ -134,7 +134,7 @@ function distributeMonthlyZennRanking() {
   try {
     const webhookUrls = fetchSlackWebhookUrls()
     const articles = fetchAndSortZennArticles(TIME_PERIOD.MONTHLY)
-    const databasePath = saveArticlesToNotion(articles, TIME_PERIOD.MONTHLY)
+    const databasePath = saveZennArticlesToNotion(articles, TIME_PERIOD.MONTHLY)
     const message = formatZennArticleForSlack(articles, TIME_PERIOD.MONTHLY, databasePath)
     webhookUrls.forEach((webhookUrl) => {
       const decryptedUrl = decryptData(webhookUrl, ENCRYPTO_PASSPHRASE)
@@ -178,7 +178,7 @@ function distributeWeeklyZennRanking() {
   try {
     const webhookUrls = fetchSlackWebhookUrls()
     const articles = fetchAndSortZennArticles(TIME_PERIOD.WEEKLY)
-    const databasePath = saveArticlesToNotion(articles, TIME_PERIOD.WEEKLY)
+    const databasePath = saveZennArticlesToNotion(articles, TIME_PERIOD.WEEKLY)
     const message = formatZennArticleForSlack(articles, TIME_PERIOD.WEEKLY, databasePath)
     webhookUrls.forEach((webhookUrl) => {
       const decryptedUrl = decryptData(webhookUrl, ENCRYPTO_PASSPHRASE)
@@ -221,7 +221,7 @@ function distributeMonthlyQiitaRanking() {
   try {
     const webhookUrls = fetchSlackWebhookUrls()
     const articles = fetchAndSortQiitaArticles(TIME_PERIOD.MONTHLY)
-    const databasePath = saveArticlesToNotion(articles, TIME_PERIOD.MONTHLY)
+    const databasePath = saveQiitaArticlesToNotion(articles, TIME_PERIOD.MONTHLY)
     const message = formatQiitaArticleForSlack(articles, TIME_PERIOD.MONTHLY, databasePath)
     webhookUrls.forEach((webhookUrl) => {
       const decryptedUrl = decryptData(webhookUrl, ENCRYPTO_PASSPHRASE)
@@ -265,7 +265,7 @@ function distributeWeeklyQiitaRanking() {
   try {
     const webhookUrls = fetchSlackWebhookUrls()
     const articles = fetchAndSortQiitaArticles(TIME_PERIOD.WEEKLY)
-    const databasePath = saveArticlesToNotion(articles, TIME_PERIOD.WEEKLY)
+    const databasePath = saveQiitaArticlesToNotion(articles, TIME_PERIOD.WEEKLY)
     const message = formatQiitaArticleForSlack(articles, TIME_PERIOD.WEEKLY, databasePath)
     webhookUrls.forEach((webhookUrl) => {
       const decryptedUrl = decryptData(webhookUrl, ENCRYPTO_PASSPHRASE)

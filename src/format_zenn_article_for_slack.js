@@ -16,7 +16,7 @@ export function formatZennArticleForSlack(articles, period, databasePath) {
         elements: [
           {
             type: 'mrkdwn',
-            text: `${formattedStart} ~ ${formattedEnd} のランキングが発表されたよ〜`
+            text: `Zennの ${formattedStart} ~ ${formattedEnd} のランキングが発表されたよ〜`
           }
         ]
       }

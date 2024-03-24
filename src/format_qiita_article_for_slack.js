@@ -2,7 +2,7 @@ import { formatDate, escapeMarkdownSpecialChars, getTimePeriod } from './utils'
 import { NOTION_PUB_URL } from './script_property'
 import { SLACK_ARTICLES_COOUNT } from './constants'
 
-export function formatMessageForSlack(articles, period, databasePath) {
+export function formatQiitaArticleForSlack(articles, period, databasePath) {
   const now = new Date()
   const { start, end } = getTimePeriod(now, period)
 
@@ -16,7 +16,7 @@ export function formatMessageForSlack(articles, period, databasePath) {
         elements: [
           {
             type: 'mrkdwn',
-            text: `${formattedStart} ~ ${formattedEnd} のランキングが発表されたよ〜`
+            text: `Qiitaの ${formattedStart} ~ ${formattedEnd} のランキングが発表されたよ〜`
           }
         ]
       }
@@ -29,10 +29,10 @@ export function formatMessageForSlack(articles, period, databasePath) {
   topArticles.forEach((article) => {
     const title = `*<${article.url || ''}|${escapeMarkdownSpecialChars(article.title)}>*`
     const author = `*<${article.userLink || ''}|${escapeMarkdownSpecialChars(article.username)}>*`
-    const publisheDate = formatDate(new Date(article.publishedAt))
+    const publisheDate = formatDate(new Date(article.createdAt))
     let topics = ''
-    for (const topic of article.topics) {
-      topics += '`' + topic + '` '
+    for (const tag of article.tags) {
+      topics += '`' + tag + '` '
     }
     let emoji
     switch (rank) {
@@ -79,7 +79,7 @@ export function formatMessageForSlack(articles, period, databasePath) {
         },
         {
           type: 'mrkdwn',
-          text: `*いいね数:* ${article.likedCount}`
+          text: `*いいね数:* ${article.likesCount}`
         }
       ]
     })
@@ -93,7 +93,21 @@ export function formatMessageForSlack(articles, period, databasePath) {
         },
         {
           type: 'mrkdwn',
+          text: `*ストック数:* ${article.stocksCount}`
+        }
+      ]
+    })
+
+    message.blocks.push({
+      type: 'section',
+      fields: [
+        {
+          type: 'mrkdwn',
           text: `*トピック:* ${topics}`
+        },
+        {
+          type: 'mrkdwn',
+          text: ''
         }
       ]
     })

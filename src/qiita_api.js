@@ -64,7 +64,12 @@ export function fetchAndSortQiitaArticles(period) {
     }
   })
 
-  let sortedArticles = articleInfos.sort((a, b) => b.likesCount - a.likesCount)
+  // いいね数とストック数の合計でソート
+  let sortedArticles = articleInfos.sort((a, b) => {
+    const totalLikesAndStocksA = a.likesCount + a.stocksCount
+    const totalLikesAndStocksB = b.likesCount + b.stocksCount
+    return totalLikesAndStocksB - totalLikesAndStocksA
+  })
 
   if (sortedArticles.length > cutoff) {
     sortedArticles = sortedArticles.slice(0, cutoff)
