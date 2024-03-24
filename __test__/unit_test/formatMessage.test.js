@@ -1,4 +1,4 @@
-import { formatMessageForSlack, formatErrorMessageForSlack } from '../../src/format_message_for_slack' // 関数が含まれるファイルのパスを適切に設定してください
+import { formatZennArticleForSlack, formatErrorMessageForSlack } from '../../src/format_zenn_article_for_slack' // 関数が含まれるファイルのパスを適切に設定してください
 import * as utils from '../../src/utils'
 
 // モック関数の設定
@@ -13,7 +13,7 @@ jest.mock('../../src/script_property', () => ({
   NOTION_PUB_URL: 'mocked value'
 }))
 
-describe('formatMessageForSlack', () => {
+describe('formatZennArticleForSlack', () => {
   it('formats a message for Slack with articles', () => {
     // getTimePeriod と formatDate のモック実装
     utils.getTimePeriod.mockReturnValue({ start: new Date(2020, 0, 1), end: new Date(2020, 0, 7) })
@@ -36,7 +36,7 @@ describe('formatMessageForSlack', () => {
     const period = 'weekly' // または 'monthly'
     const databasePath = '/path/to/database'
 
-    const result = formatMessageForSlack(articles, period, databasePath)
+    const result = formatZennArticleForSlack(articles, period, databasePath)
     expect(result).toHaveProperty('blocks')
     expect(result.blocks.length).toBeGreaterThan(0)
     // さらに詳細な検証を行う

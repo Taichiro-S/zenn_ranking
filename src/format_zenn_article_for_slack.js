@@ -2,7 +2,7 @@ import { formatDate, escapeMarkdownSpecialChars, getTimePeriod } from './utils'
 import { NOTION_PUB_URL } from './script_property'
 import { SLACK_ARTICLES_COOUNT } from './constants'
 
-export function formatMessageForSlack(articles, period, databasePath) {
+export function formatZennArticleForSlack(articles, period, databasePath) {
   const now = new Date()
   const { start, end } = getTimePeriod(now, period)
 
@@ -16,7 +16,7 @@ export function formatMessageForSlack(articles, period, databasePath) {
         elements: [
           {
             type: 'mrkdwn',
-            text: `${formattedStart} ~ ${formattedEnd} のランキングが発表されたよ〜`
+            text: `Zennの ${formattedStart} ~ ${formattedEnd} のランキングが発表されたよ〜`
           }
         ]
       }

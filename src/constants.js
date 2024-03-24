@@ -1,8 +1,10 @@
 export const WEEKLY_RANKING_COUNT = 30
 export const MONTHLY_RANKING_COUNT = 50
 export const ZENN_ARTICLE_API_ENDPOINT = 'https://zenn.dev/api/articles'
+export const QIITA_ARTICLE_API_ENDPOINT = 'https://qiita.com/api/v2/items'
 export const MIN_LIKED_COUNT = 10
 export const ZENN_URL = 'https://zenn.dev'
+export const QIITA_URL = 'https://qiita.com/'
 export const TIME_PERIOD = {
   WEEKLY: 'weekly',
   MONTHLY: 'monthly'

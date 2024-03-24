@@ -53,8 +53,23 @@ export const CLOUD_DATASTORE_TABLE_FOR_ARTICLES = scriptProperties.getProperty('
 export const REDIRECT_URL = scriptProperties.getProperty('REDIRECT_URL')
 
 export const NOTION_API_KEY = scriptProperties.getProperty('NOTION_API_KEY')
-export const NOTION_MONTHLY_DATABASE_PARENT_ID = scriptProperties.getProperty('NOTION_MONTHLY_DATABASE_PARENT_ID')
-export const NOTION_WEEKLY_DATABASE_PARENT_ID = scriptProperties.getProperty('NOTION_WEEKLY_DATABASE_PARENT_ID')
+export const NOTION_ZENN_MONTHLY_DATABASE_PARENT_ID = scriptProperties.getProperty(
+  'NOTION_ZENN_MONTHLY_DATABASE_PARENT_ID'
+)
+export const NOTION_ZENN_WEEKLY_DATABASE_PARENT_ID = scriptProperties.getProperty(
+  'NOTION_ZENN_WEEKLY_DATABASE_PARENT_ID'
+)
+export const NOTION_QIITA_MONTHLY_DATABASE_PARENT_ID = scriptProperties.getProperty(
+  'NOTION_QIITA_MONTHLY_DATABASE_PARENT_ID'
+)
+export const NOTION_QIITA_WEEKLY_DATABASE_PARENT_ID = scriptProperties.getProperty(
+  'NOTION_QIITA_WEEKLY_DATABASE_PARENT_ID'
+)
+
+/**
+ * ランキングを公開しているページのURL
+ * @type {string}
+ */
 export const NOTION_PUB_URL = scriptProperties.getProperty('NOTION_PUB_URL')
 
 /**
@@ -62,3 +77,9 @@ export const NOTION_PUB_URL = scriptProperties.getProperty('NOTION_PUB_URL')
  * @type {string}
  */
 export const ENCRYPTO_PASSPHRASE = scriptProperties.getProperty('ENCRYPTO_PASSPHRASE')
+
+/**
+ * Qiitaのアクセストークン
+ * @type {string}
+ */
+export const QIITA_ACCESS_TOKEN = scriptProperties.getProperty('QIITA_ACCESS_TOKEN')
