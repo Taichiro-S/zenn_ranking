@@ -1,4 +1,4 @@
-import { formatZennArticleForSlack, formatErrorMessageForSlack } from '../../src/format_message_for_slack' // 関数が含まれるファイルのパスを適切に設定してください
+import { formatZennArticleForSlack, formatErrorMessageForSlack } from '../../src/format_zenn_article_for_slack' // 関数が含まれるファイルのパスを適切に設定してください
 import * as utils from '../../src/utils'
 
 // モック関数の設定
