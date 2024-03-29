@@ -40,14 +40,11 @@ jobs:
         run: |
           echo "ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }}" >> $GITHUB_ENV
           echo "SCOPE=${{ secrets.SCOPE }}" >> $GITHUB_ENV
-          echo "TOKEN_TYPE=${{ secrets.TOKEN_TYPE }}" >> $GITHUB_ENV
           echo "ID_TOKEN=${{ secrets.ID_TOKEN }}" >> $GITHUB_ENV
-          echo "EXPIRY_DATE=${{ secrets.EXPIRY_DATE }}" >> $GITHUB_ENV
           echo "REFRESH_TOKEN=${{ secrets.REFRESH_TOKEN }}" >> $GITHUB_ENV
           echo "CLIENT_ID=${{ secrets.CLIENT_ID }}" >> $GITHUB_ENV
           echo "CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}" >> $GITHUB_ENV
           echo "REDIRECT_URI=${{ secrets.REDIRECT_URI }}" >> $GITHUB_ENV
-          echo "IS_LOCAL_CREDS=${{ secrets.IS_LOCAL_CREDS }}" >> $GITHUB_ENV
 
       - name: Generate .clasprc.json
         run: |
@@ -55,14 +52,11 @@ jobs:
         env:
           ACCESS_TOKEN: ${{ env.ACCESS_TOKEN }}
           SCOPE: ${{ env.SCOPE }}
-          TOKEN_TYPE: ${{ env.TOKEN_TYPE }}
           ID_TOKEN: ${{ env.ID_TOKEN }}
-          EXPIRY_DATE: ${{ env.EXPIRY_DATE }}
           REFRESH_TOKEN: ${{ env.REFRESH_TOKEN }}
           CLIENT_ID: ${{ env.CLIENT_ID }}
           CLIENT_SECRET: ${{ env.CLIENT_SECRET }}
           REDIRECT_URI: ${{ env.REDIRECT_URI }}
-          IS_LOCAL_CREDS: ${{ env.IS_LOCAL_CREDS }}
 
       - name: Move .clasprc.json and .clasp.json to home directory
         run: |
