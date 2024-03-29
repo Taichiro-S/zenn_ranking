@@ -7,6 +7,7 @@ import {
 } from './script_property'
 import { formatQiitaArticleForSlack } from './format_qiita_article_for_slack'
 import { formatZennArticleForSlack } from './format_zenn_article_for_slack'
+import { formatZennArticleForTwitter } from './format_zenn_article_for_twitter'
 import { sendMessageToSlackChannel } from './slack_api'
 import {
   fetchSlackWebhookUrls,
@@ -24,6 +25,7 @@ import {
 } from './constants'
 import { fetchAndSortZennArticles } from './zenn_api'
 import { fetchAndSortQiitaArticles } from './qiita_api'
+import { postTweet, authorizeTwitterApp } from './twitter_api'
 import { saveZennArticlesToNotion, saveQiitaArticlesToNotion } from './notion_api'
 import { decryptData } from './utils'
 // GASから関数を呼び出すために、グローバル変数に登録する
@@ -31,6 +33,8 @@ global.distributeMonthlyZennRanking = distributeMonthlyZennRanking
 global.distributeWeeklyZennRanking = distributeWeeklyZennRanking
 global.distributeMonthlyQiitaRanking = distributeMonthlyQiitaRanking
 global.distributeWeeklyQiitaRanking = distributeWeeklyQiitaRanking
+global.postTweet = postTweet
+global.authorizeTwitterApp = authorizeTwitterApp
 global.doGet = doGet
 global.doPost = doPost
 
@@ -180,6 +184,7 @@ function distributeWeeklyZennRanking() {
     const articles = fetchAndSortZennArticles(TIME_PERIOD.WEEKLY)
     const databasePath = saveZennArticlesToNotion(articles, TIME_PERIOD.WEEKLY)
     const message = formatZennArticleForSlack(articles, TIME_PERIOD.WEEKLY, databasePath)
+    const tweet = formatZennArticleForTwitter(articles, databasePath)
     webhookUrls.forEach((webhookUrl) => {
       const decryptedUrl = decryptData(webhookUrl, ENCRYPTO_PASSPHRASE)
       try {
@@ -189,6 +194,8 @@ function distributeWeeklyZennRanking() {
         err = true
       }
     })
+
+    postTweet(tweet)
 
     if (err) {
       MailApp.sendEmail(
