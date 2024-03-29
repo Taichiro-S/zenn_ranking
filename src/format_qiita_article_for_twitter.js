@@ -9,7 +9,7 @@ export const formatQiitaArticleForTwitter = (articles, databasePath) => {
   const link = articles[0].url
   const tags = articles[0].tags
   const text = `
-今週のZennのいいね数トップ記事は...
+先週のQiitaのいいね数+ストック数トップ記事は...
 「${title}」
 ${author}さん
 ${likes}いいね
@@ -17,7 +17,7 @@ ${stocks}ストック
 でした！
 ランキングはこちらから👉${fullPath}
 ${link}
-#Zenn #Zenn記事ランキング #${tags.join(' #')}
+#Qiita #Qiita記事ランキング #${tags.join(' #')}
 `
 
   return { text }

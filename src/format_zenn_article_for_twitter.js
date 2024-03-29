@@ -8,7 +8,7 @@ export const formatZennArticleForTwitter = (articles, databasePath) => {
   const link = articles[0].url
   const topics = articles[0].topics
   const text = `
-今週のZennのいいね数トップ記事は...
+先週のZennのいいね数トップ記事は...
 「${title}」
 ${author}さん
 ${likes}いいね
