@@ -1,4 +1,5 @@
-import { NOTION_PUB_URL, TWITTER_ARTICLES_COOUNT } from './script_property.js'
+import { NOTION_PUB_URL } from './script_property.js'
+import { TWITTER_ARTICLES_COOUNT } from './constants.js'
 
 export const formatZennArticleForTwitter = (articles, databasePath) => {
   let rank = 1
