@@ -26,7 +26,7 @@ import {
 } from './constants'
 import { fetchAndSortZennArticles } from './zenn_api'
 import { fetchAndSortQiitaArticles } from './qiita_api'
-import { postTweet, authorizeTwitterApp } from './twitter_api'
+import { postTweet, authorizeTwitterApp, logRedirectUri, authCallback } from './twitter_api'
 import { saveZennArticlesToNotion, saveQiitaArticlesToNotion } from './notion_api'
 import { decryptData } from './utils'
 // GASから関数を呼び出すために、グローバル変数に登録する
@@ -35,6 +35,8 @@ global.distributeWeeklyZennRanking = distributeWeeklyZennRanking
 global.distributeMonthlyQiitaRanking = distributeMonthlyQiitaRanking
 global.distributeWeeklyQiitaRanking = distributeWeeklyQiitaRanking
 global.authorizeTwitterApp = authorizeTwitterApp
+global.authCallback = authCallback
+global.logRedirectUri = logRedirectUri
 global.doGet = doGet
 global.doPost = doPost
 
