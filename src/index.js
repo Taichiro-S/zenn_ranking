@@ -8,6 +8,7 @@ import {
 import { formatQiitaArticleForSlack } from './format_qiita_article_for_slack'
 import { formatZennArticleForSlack } from './format_zenn_article_for_slack'
 import { formatZennArticleForTwitter } from './format_zenn_article_for_twitter'
+import { formatQiitaArticleForTwitter } from './format_qiita_article_for_twitter'
 import { sendMessageToSlackChannel } from './slack_api'
 import {
   fetchSlackWebhookUrls,
@@ -275,6 +276,7 @@ function distributeWeeklyQiitaRanking() {
     const articlesReversed = articles.toReversed()
     const databasePath = saveQiitaArticlesToNotion(articlesReversed, TIME_PERIOD.WEEKLY)
     const message = formatQiitaArticleForSlack(articles, TIME_PERIOD.WEEKLY, databasePath)
+    const tweet = formatQiitaArticleForTwitter(articles, databasePath)
     webhookUrls.forEach((webhookUrl) => {
       const decryptedUrl = decryptData(webhookUrl, ENCRYPTO_PASSPHRASE)
       try {
@@ -284,7 +286,7 @@ function distributeWeeklyQiitaRanking() {
         err = true
       }
     })
-
+    postTweet(tweet)
     if (err) {
       MailApp.sendEmail(
         ADMIN_EMAIL,

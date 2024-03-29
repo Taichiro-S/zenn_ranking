@@ -48,4 +48,4 @@ export const GCP_LOGGING_URL = 'https://console.cloud.google.com/logs/query?auth
 export const QIITA_MAX_PAGE = 100
 
 export const TWITTER_API_POST_ENDPOINT = 'https://api.twitter.com/2/tweets'
-export const TWITTER_ARTICLES_COOUNT = 5
+export const TWITTER_ARTICLES_COUNT = 5
