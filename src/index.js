@@ -34,7 +34,6 @@ global.distributeMonthlyZennRanking = distributeMonthlyZennRanking
 global.distributeWeeklyZennRanking = distributeWeeklyZennRanking
 global.distributeMonthlyQiitaRanking = distributeMonthlyQiitaRanking
 global.distributeWeeklyQiitaRanking = distributeWeeklyQiitaRanking
-global.postTweet = postTweet
 global.authorizeTwitterApp = authorizeTwitterApp
 global.doGet = doGet
 global.doPost = doPost
